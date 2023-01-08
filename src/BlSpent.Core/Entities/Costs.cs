@@ -8,23 +8,23 @@ namespace BlSpent.Core.Entities;
 public class Costs : Entity
 {
     /// <summary>
-    /// Entry date
+    /// Costs date
     /// </summary>
-    public DateTime EntryDate { get; }
+    public DateTime CostDate { get; }
 
     /// <summary>
-    /// Entry base date
+    /// Cost base date
     /// </summary>
     public BaseDate EntryBaseDate { get; }
 
     /// <summary>
-    /// Value
+    /// Value of cost
     /// </summary>
     public double Value { get; }
 
     private Costs(DateTime entryDate, BaseDate entryBaseDate, double value)
     {
-        EntryDate = entryDate;
+        CostDate = entryDate;
         EntryBaseDate = entryBaseDate;
         Value = value;
     }
@@ -35,6 +35,9 @@ public class Costs : Entity
     /// <returns>new costs</returns>
     public static Costs Create(double value)
     {
+        if (value > 0)
+            throw new Exception();
+
         var dtTimeNow = DateTime.Now;
         return new Costs(dtTimeNow, new BaseDate(dtTimeNow), value);
     }
