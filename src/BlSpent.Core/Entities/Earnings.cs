@@ -29,6 +29,28 @@ public class Earnings : Entity
         Value = value;
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (!base.Equals(obj))
+            return false;
+        
+        var earnings = obj as Earnings;
+        if (earnings is null)
+            return false;
+
+        if (!this.EarnDate.Equals(earnings.EarnDate) ||
+            !this.EntryBaseDate.Equals(earnings.EntryBaseDate) ||
+            !this.Value.Equals(earnings.Value))
+            return false;
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode() * 56785687;
+    }
+
     /// <summary>
     /// Creates a new earn with current date
     /// </summary>

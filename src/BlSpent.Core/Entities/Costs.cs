@@ -29,6 +29,27 @@ public class Costs : Entity
         Value = value;
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (!base.Equals(obj))
+            return false;
+        
+        var cost = obj as Costs;
+        if (cost is null)
+            return false;
+        if (!this.CostDate.Equals(cost.CostDate) ||
+            !this.EntryBaseDate.Equals(cost.EntryBaseDate) ||
+            !this.Value.Equals(cost.Value))
+            return false;
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode() * 1293129312;
+    }
+
     /// <summary>
     /// Creates a new cost with current date
     /// </summary>

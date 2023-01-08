@@ -21,6 +21,27 @@ public class Goals : Entity
         Value = value;
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (!base.Equals(obj))
+            return false;
+        
+        var goals = obj as Goals;
+        if (goals is null)
+            return false;
+
+        if (!this.TargetDate.Equals(goals.TargetDate) ||
+            !this.Value.Equals(goals.Value))
+            return false;
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode() * 458969457;
+    }
+
     /// <summary>
     /// Creates a goals
     /// </summary>

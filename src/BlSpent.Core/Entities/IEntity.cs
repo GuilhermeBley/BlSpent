@@ -19,6 +19,9 @@ public abstract class Entity : IEntity
     private Guid _id = Guid.NewGuid();
     public Guid Id => _id;
     
+    /// <summary>
+    /// Check entities
+    /// </summary>
     public override bool Equals(object? obj)
     {
         if (obj is null)
