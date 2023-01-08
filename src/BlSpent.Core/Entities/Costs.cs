@@ -30,15 +30,26 @@ public class Costs : Entity
     }
 
     /// <summary>
+    /// Creates a new cost with current date
+    /// </summary>
+    /// <param name="value">Value of earn</param>
+    /// <returns>new earn</returns>
+    public static Costs CreateWithCurrentDate(double value)
+    {
+        return Create(DateTime.Now, value);
+    }
+
+    /// <summary>
     /// Creates a costs
     /// </summary>
+    /// <param name="costDate">Date of costs</param>
+    /// <param name="value">Value of earn</param>
     /// <returns>new costs</returns>
-    public static Costs Create(double value)
+    public static Costs Create(DateTime costDate, double value)
     {
         if (value > 0)
             throw new Exception();
 
-        var dtTimeNow = DateTime.Now;
-        return new Costs(dtTimeNow, new BaseDate(dtTimeNow), value);
+        return new Costs(costDate, new BaseDate(costDate), value);
     }
 }
