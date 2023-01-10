@@ -69,7 +69,7 @@ public class Costs : Entity
     public static Costs Create(DateTime costDate, double value)
     {
         if (value > 0)
-            throw new GenericCoreException("Invalid value, must be more than '0'.");
+            throw new GenericCoreException("Invalid value, must be less than '0'.");
 
         return new Costs(costDate, new BaseDate(costDate), value);
     }

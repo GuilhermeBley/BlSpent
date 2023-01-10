@@ -70,7 +70,7 @@ public class Earnings : Entity
     public static Earnings Create(DateTime earnDate, double value)
     {
         if (value < 0)
-            throw new GenericCoreException("Invalid value, must be less than '0'.");
+            throw new GenericCoreException("Invalid value, must be more than '0'.");
 
         return new Earnings(earnDate, new BaseDate(earnDate), value);
     }

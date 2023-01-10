@@ -49,10 +49,10 @@ public class Goals : Entity
     public static Goals Create(DateTime target, double value)
     {
         if (target < DateTime.Now)
-            throw new Exception();
+            throw new GenericCoreException("Target must be more than now date.");
 
         if (value < 0)
-            throw new Exception();
+            throw new GenericCoreException("Invalid value, must be more than '0'.");
 
         return new Goals(target, value);
     }

@@ -16,7 +16,7 @@ public interface IEntity
 /// </summary>
 public abstract class Entity : IEntity
 {
-    private Guid _id = Guid.NewGuid();
+    protected virtual Guid _id { get; } = Guid.NewGuid();
     public Guid Id => _id;
     
     /// <summary>
