@@ -5,7 +5,7 @@ public class User : Entity
     public const int MAX_COUNT_ACCESS_FAILED = 10;
     public const int MIN_COUNT_ACCESS_FAILED = 0;
     public override Guid Id { get; }
-    public string UserName { get; private set; }
+    public string UserName => Email;
     public string Email { get; private set; }
     public bool EmailConfirmed { get; private set; }
     public string PhoneNumber { get; private set; }
@@ -19,7 +19,6 @@ public class User : Entity
 
     private User(
         Guid id, 
-        string userName, 
         string email, 
         bool emailConfirmed, 
         string phoneNumber, 
@@ -32,7 +31,6 @@ public class User : Entity
         string lastName)
     {
         Id = id;
-        UserName = userName;
         Email = email;
         EmailConfirmed = emailConfirmed;
         PhoneNumber = phoneNumber;
@@ -46,8 +44,7 @@ public class User : Entity
     }
 
     public static User Create(
-        Guid id, 
-        string userName, 
+        Guid id,
         string email, 
         bool emailConfirmed, 
         string phoneNumber, 
@@ -62,15 +59,14 @@ public class User : Entity
         if (Guid.Empty == id)
             throw new GenericCoreException($"{nameof(id)} can't be empty.");
 
-        CheckFields(userName, email, emailConfirmed, phoneNumber, phoneNumberConfirmed, twoFactoryEnabled, 
+        CheckFields(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, twoFactoryEnabled, 
             lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName);
 
-        return new User(id, userName.Trim(), email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
+        return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
             twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim());
     }
 
     private static void CheckFields(
-        string userName, 
         string email, 
         bool emailConfirmed, 
         string phoneNumber, 
@@ -85,9 +81,6 @@ public class User : Entity
         if (accessFailedCount > MAX_COUNT_ACCESS_FAILED 
             || accessFailedCount < MIN_COUNT_ACCESS_FAILED)
             throw new GenericCoreException($"{nameof(accessFailedCount)} must be in range between '{MIN_COUNT_ACCESS_FAILED}' to '{MAX_COUNT_ACCESS_FAILED}'.");
-
-        if (string.IsNullOrWhiteSpace(userName))
-            throw new GenericCoreException($"{nameof(userName)} is null or empty.");
         
         if (string.IsNullOrWhiteSpace(email))
             throw new GenericCoreException($"{nameof(email)} is null or empty.");
