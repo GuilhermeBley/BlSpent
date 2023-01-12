@@ -5,7 +5,7 @@ namespace BlSpent.Core.Entities;
 /// <summary>
 /// Represents a earns
 /// </summary>
-public class Earnings : Entity
+public class Earning : Entity
 {
     /// <summary>
     /// Costs date
@@ -22,7 +22,7 @@ public class Earnings : Entity
     /// </summary>
     public double Value { get; }
 
-    private Earnings(DateTime earnDate, BaseDate entryBaseDate, double value)
+    private Earning(DateTime earnDate, BaseDate entryBaseDate, double value)
     {
         EarnDate = earnDate;
         EntryBaseDate = entryBaseDate;
@@ -34,7 +34,7 @@ public class Earnings : Entity
         if (!base.Equals(obj))
             return false;
         
-        var earnings = obj as Earnings;
+        var earnings = obj as Earning;
         if (earnings is null)
             return false;
 
@@ -56,7 +56,7 @@ public class Earnings : Entity
     /// </summary>
     /// <param name="value">Value of earn</param>
     /// <returns>new earn</returns>
-    public static Earnings CreateWithCurrentDate(double value)
+    public static Earning CreateWithCurrentDate(double value)
     {
         return Create(DateTime.Now, value);
     }
@@ -67,11 +67,11 @@ public class Earnings : Entity
     /// <param name="earnDate">Date of earn</param>
     /// <param name="value">Value of earn</param>
     /// <returns>new earn</returns>
-    public static Earnings Create(DateTime earnDate, double value)
+    public static Earning Create(DateTime earnDate, double value)
     {
         if (value < 0)
             throw new GenericCoreException("Invalid value, must be more than '0'.");
 
-        return new Earnings(earnDate, new BaseDate(earnDate), value);
+        return new Earning(earnDate, new BaseDate(earnDate), value);
     }
 }

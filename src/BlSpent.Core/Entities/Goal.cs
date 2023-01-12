@@ -3,7 +3,7 @@ namespace BlSpent.Core.Entities;
 /// <summary>
 /// Represents a goals
 /// </summary>
-public class Goals : Entity
+public class Goal : Entity
 {
     /// <summary>
     /// Target date to goal
@@ -15,7 +15,7 @@ public class Goals : Entity
     /// </summary>
     public double Value { get; }
 
-    private Goals(DateTime targetDate, double value)
+    private Goal(DateTime targetDate, double value)
     {
         TargetDate = targetDate;
         Value = value;
@@ -26,7 +26,7 @@ public class Goals : Entity
         if (!base.Equals(obj))
             return false;
         
-        var goals = obj as Goals;
+        var goals = obj as Goal;
         if (goals is null)
             return false;
 
@@ -46,7 +46,7 @@ public class Goals : Entity
     /// Creates a goals
     /// </summary>
     /// <returns>new goals</returns>
-    public static Goals Create(DateTime target, double value)
+    public static Goal Create(DateTime target, double value)
     {
         if (target < DateTime.Now)
             throw new GenericCoreException("Target must be more than now date.");
@@ -54,6 +54,6 @@ public class Goals : Entity
         if (value < 0)
             throw new GenericCoreException("Invalid value, must be more than '0'.");
 
-        return new Goals(target, value);
+        return new Goal(target, value);
     }
 }

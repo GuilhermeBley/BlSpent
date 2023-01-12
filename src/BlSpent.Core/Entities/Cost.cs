@@ -5,7 +5,7 @@ namespace BlSpent.Core.Entities;
 /// <summary>
 /// Represent a costs
 /// </summary>
-public class Costs : Entity
+public class Cost : Entity
 {
     /// <summary>
     /// Costs date
@@ -22,7 +22,7 @@ public class Costs : Entity
     /// </summary>
     public double Value { get; }
 
-    private Costs(DateTime entryDate, BaseDate entryBaseDate, double value)
+    private Cost(DateTime entryDate, BaseDate entryBaseDate, double value)
     {
         CostDate = entryDate;
         EntryBaseDate = entryBaseDate;
@@ -34,7 +34,7 @@ public class Costs : Entity
         if (!base.Equals(obj))
             return false;
         
-        var cost = obj as Costs;
+        var cost = obj as Cost;
         if (cost is null)
             return false;
         if (!this.CostDate.Equals(cost.CostDate) ||
@@ -55,7 +55,7 @@ public class Costs : Entity
     /// </summary>
     /// <param name="value">Value of earn</param>
     /// <returns>new earn</returns>
-    public static Costs CreateWithCurrentDate(double value)
+    public static Cost CreateWithCurrentDate(double value)
     {
         return Create(DateTime.Now, value);
     }
@@ -66,11 +66,11 @@ public class Costs : Entity
     /// <param name="costDate">Date of costs</param>
     /// <param name="value">Value of earn</param>
     /// <returns>new costs</returns>
-    public static Costs Create(DateTime costDate, double value)
+    public static Cost Create(DateTime costDate, double value)
     {
         if (value > 0)
             throw new GenericCoreException("Invalid value, must be less than '0'.");
 
-        return new Costs(costDate, new BaseDate(costDate), value);
+        return new Cost(costDate, new BaseDate(costDate), value);
     }
 }
