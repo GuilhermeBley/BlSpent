@@ -1,22 +1,87 @@
 namespace BlSpent.Core.Entities;
 
+/// <summary>
+/// Represents a user
+/// </summary>
 public class User : Entity
 {
     public const int MAX_COUNT_ACCESS_FAILED = 10;
     public const int MIN_COUNT_ACCESS_FAILED = 0;
+
+    /// <summary>
+    /// Identifier
+    /// </summary>
     public override Guid Id { get; }
+
+    /// <summary>
+    /// Username is same of user email, the username is unique
+    /// </summary>
     public string UserName => Email;
+
+    /// <summary>
+    /// Email
+    /// </summary>
     public string Email { get; private set; }
+
+    /// <summary>
+    /// Email confirmed
+    /// </summary>
     public bool EmailConfirmed { get; private set; }
+
+    /// <summary>
+    /// Phone number
+    /// </summary>
     public string PhoneNumber { get; private set; }
+
+    /// <summary>
+    /// Is phone number confirmed
+    /// </summary>
     public bool PhoneNumberConfirmed { get; private set; }
+
+    /// <summary>
+    /// Is two factory enabled
+    /// </summary>
     public bool TwoFactoryEnabled { get; private set; }
+
+    /// <summary>
+    /// Date until lockout
+    /// </summary>
     public DateTime? LockOutEnd { get; private set; }
+
+    /// <summary>
+    /// Is lockout enabled
+    /// </summary>
     public bool LockOutEnabled { get; private set; }
+
+    /// <summary>
+    /// Count of fails access
+    /// </summary>
     public int AccessFailedCount { get; private set; }
+
+    /// <summary>
+    /// First name
+    /// </summary>
     public string Name { get; private set; }
+
+    /// <summary>
+    /// Last name
+    /// </summary>
     public string LastName { get; private set; }
 
+    /// <summary>
+    /// Private instance
+    /// </summary>
+    /// <param name="id"><inheritdoc cref="Id" path="/summary"/></param>
+    /// <param name="email"><inheritdoc cref="Email" path="/summary"/></param>
+    /// <param name="emailConfirmed"><inheritdoc cref="EmailConfirmed" path="/summary"/></param>
+    /// <param name="phoneNumber"><inheritdoc cref="PhoneNumber" path="/summary"/></param>
+    /// <param name="phoneNumberConfirmed"><inheritdoc cref="PhoneNumberConfirmed" path="/summary"/></param>
+    /// <param name="twoFactoryEnabled"><inheritdoc cref="TwoFactoryEnabled" path="/summary"/></param>
+    /// <param name="lockOutEnd"><inheritdoc cref="LockOutEnd" path="/summary"/></param>
+    /// <param name="lockOutEnabled"><inheritdoc cref="LockOutEnabled" path="/summary"/></param>
+    /// <param name="accessFailedCount"><inheritdoc cref="AccessFailedCount" path="/summary"/></param>
+    /// <param name="name"><inheritdoc cref="Name" path="/summary"/></param>
+    /// <param name="lastName"><inheritdoc cref="LastName" path="/summary"/></param>
     private User(
         Guid id, 
         string email, 
@@ -43,6 +108,50 @@ public class User : Entity
         LastName = lastName;
     }
 
+    
+    public override bool Equals(object? obj)
+    {
+        if (!base.Equals(obj))
+            return false;
+        
+        var user = obj as User;
+        if (user is null)
+            return false;
+
+        if (!this.Email.Equals(user.Email) ||
+            !this.EmailConfirmed.Equals(user.EmailConfirmed) ||
+            !this.PhoneNumber.Equals(user.PhoneNumber) ||
+            !this.PhoneNumberConfirmed.Equals(user.PhoneNumberConfirmed) ||
+            !this.TwoFactoryEnabled.Equals(user.TwoFactoryEnabled) ||
+            !this.LockOutEnd.Equals(user.LockOutEnd) ||
+            !this.LockOutEnabled.Equals(user.LockOutEnabled) ||
+            !this.AccessFailedCount.Equals(user.AccessFailedCount) ||
+            !this.Name.Equals(user.Name) ||
+            !this.LastName.Equals(user.LastName))
+            return false;
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode() * 45864957;
+    }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="User"/>
+    /// </summary>
+    /// <param name="email"><inheritdoc cref="Email" path="/summary"/></param>
+    /// <param name="emailConfirmed"><inheritdoc cref="EmailConfirmed" path="/summary"/></param>
+    /// <param name="phoneNumber"><inheritdoc cref="PhoneNumber" path="/summary"/></param>
+    /// <param name="phoneNumberConfirmed"><inheritdoc cref="PhoneNumberConfirmed" path="/summary"/></param>
+    /// <param name="twoFactoryEnabled"><inheritdoc cref="TwoFactoryEnabled" path="/summary"/></param>
+    /// <param name="lockOutEnd"><inheritdoc cref="LockOutEnd" path="/summary"/></param>
+    /// <param name="lockOutEnabled"><inheritdoc cref="LockOutEnabled" path="/summary"/></param>
+    /// <param name="accessFailedCount"><inheritdoc cref="AccessFailedCount" path="/summary"/></param>
+    /// <param name="name"><inheritdoc cref="Name" path="/summary"/></param>
+    /// <param name="lastName"><inheritdoc cref="LastName" path="/summary"/></param>
+    /// <returns>new <see cref="User"/></returns>
     public static User Create(
         string email, 
         bool emailConfirmed, 
@@ -92,4 +201,6 @@ public class User : Entity
         if (name.Contains(" "))
             throw new GenericCoreException($"{nameof(name)} must not have spaces.");
     }
+
+    
 }
