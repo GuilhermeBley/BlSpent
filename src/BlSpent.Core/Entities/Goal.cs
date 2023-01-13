@@ -15,10 +15,16 @@ public class Goal : Entity
     /// </summary>
     public double Value { get; }
 
-    private Goal(DateTime targetDate, double value)
+    /// <summary>
+    /// Identifier of page
+    /// </summary>
+    public Guid PageId { get; }
+
+    private Goal(DateTime targetDate, double value, Guid pageId)
     {
         TargetDate = targetDate;
         Value = value;
+        PageId = pageId;
     }
 
     public override bool Equals(object? obj)
@@ -46,7 +52,7 @@ public class Goal : Entity
     /// Creates a goals
     /// </summary>
     /// <returns>new goals</returns>
-    public static Goal Create(DateTime target, double value)
+    public static Goal Create(DateTime target, double value, Guid pageId)
     {
         if (target < DateTime.Now)
             throw new GenericCoreException("Target must be more than now date.");
@@ -54,6 +60,9 @@ public class Goal : Entity
         if (value < 0)
             throw new GenericCoreException("Invalid value, must be more than '0'.");
 
-        return new Goal(target, value);
+        if (pageId.Equals(Guid.Empty))
+            throw new GenericCoreException("Invalid pageId. Guid Empty.");
+
+        return new Goal(target, value, pageId);
     }
 }

@@ -22,11 +22,17 @@ public class Earning : Entity
     /// </summary>
     public double Value { get; }
 
-    private Earning(DateTime earnDate, BaseDate entryBaseDate, double value)
+    /// <summary>
+    /// Identifier of page
+    /// </summary>
+    public Guid PageId { get; }
+
+    private Earning(DateTime earnDate, BaseDate entryBaseDate, double value, Guid pageId)
     {
         EarnDate = earnDate;
         EntryBaseDate = entryBaseDate;
         Value = value;
+        PageId = pageId;
     }
 
     public override bool Equals(object? obj)
@@ -56,9 +62,9 @@ public class Earning : Entity
     /// </summary>
     /// <param name="value">Value of earn</param>
     /// <returns>new earn</returns>
-    public static Earning CreateWithCurrentDate(double value)
+    public static Earning CreateWithCurrentDate(double value, Guid pageId)
     {
-        return Create(DateTime.Now, value);
+        return Create(DateTime.Now, value, pageId);
     }
 
     /// <summary>
@@ -67,11 +73,14 @@ public class Earning : Entity
     /// <param name="earnDate">Date of earn</param>
     /// <param name="value">Value of earn</param>
     /// <returns>new earn</returns>
-    public static Earning Create(DateTime earnDate, double value)
+    public static Earning Create(DateTime earnDate, double value, Guid pageId)
     {
         if (value < 0)
             throw new GenericCoreException("Invalid value, must be more than '0'.");
 
-        return new Earning(earnDate, new BaseDate(earnDate), value);
+        if (pageId.Equals(Guid.Empty))
+            throw new GenericCoreException("Invalid pageId. Guid Empty.");
+
+        return new Earning(earnDate, new BaseDate(earnDate), value, pageId);
     }
 }

@@ -22,11 +22,17 @@ public class Cost : Entity
     /// </summary>
     public double Value { get; }
 
-    private Cost(DateTime entryDate, BaseDate entryBaseDate, double value)
+    /// <summary>
+    /// Identifier of page
+    /// </summary>
+    public Guid PageId { get; }
+
+    private Cost(DateTime entryDate, BaseDate entryBaseDate, double value, Guid pageId)
     {
         CostDate = entryDate;
         EntryBaseDate = entryBaseDate;
         Value = value;
+        PageId = pageId;
     }
 
     public override bool Equals(object? obj)
@@ -55,9 +61,9 @@ public class Cost : Entity
     /// </summary>
     /// <param name="value">Value of earn</param>
     /// <returns>new earn</returns>
-    public static Cost CreateWithCurrentDate(double value)
+    public static Cost CreateWithCurrentDate(double value, Guid pageId)
     {
-        return Create(DateTime.Now, value);
+        return Create(DateTime.Now, value, pageId);
     }
 
     /// <summary>
@@ -66,11 +72,14 @@ public class Cost : Entity
     /// <param name="costDate">Date of costs</param>
     /// <param name="value">Value of earn</param>
     /// <returns>new costs</returns>
-    public static Cost Create(DateTime costDate, double value)
+    public static Cost Create(DateTime costDate, double value, Guid pageId)
     {
         if (value > 0)
             throw new GenericCoreException("Invalid value, must be less than '0'.");
 
-        return new Cost(costDate, new BaseDate(costDate), value);
+        if (pageId.Equals(Guid.Empty))
+            throw new GenericCoreException("Invalid pageId. Guid Empty.");
+            
+        return new Cost(costDate, new BaseDate(costDate), ((byte)value), pageId);
     }
 }
