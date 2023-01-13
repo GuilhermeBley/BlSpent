@@ -7,6 +7,14 @@ public class User : Entity
 {
     public const int MAX_COUNT_ACCESS_FAILED = 10;
     public const int MIN_COUNT_ACCESS_FAILED = 0;
+    public const int MIN_CHAR_USERNAME_AND_EMAIL = 4;
+    public const int MAX_CHAR_USERNAME_AND_EMAIL = 255;
+    public const int MIN_CHAR_PHONE = 8;
+    public const int MAX_CHAR_PHONE = 15;
+    public const int MIN_CHAR_NAME = 1;
+    public const int MAX_CHAR_NAME = 100;
+    public const int MIN_CHAR_LAST_NAME = 1;
+    public const int MAX_CHAR_LAST_NAME = 255;
 
     /// <summary>
     /// Identifier
@@ -31,7 +39,7 @@ public class User : Entity
     /// <summary>
     /// Phone number
     /// </summary>
-    public string PhoneNumber { get; private set; }
+    public string? PhoneNumber { get; private set; }
 
     /// <summary>
     /// Is phone number confirmed
@@ -86,7 +94,7 @@ public class User : Entity
         Guid id, 
         string email, 
         bool emailConfirmed, 
-        string phoneNumber, 
+        string? phoneNumber, 
         bool phoneNumberConfirmed, 
         bool twoFactoryEnabled, 
         DateTime? lockOutEnd, 
@@ -155,7 +163,7 @@ public class User : Entity
     public static User Create(
         string email, 
         bool emailConfirmed, 
-        string phoneNumber, 
+        string? phoneNumber, 
         bool phoneNumberConfirmed, 
         bool twoFactoryEnabled, 
         DateTime? lockOutEnd, 
@@ -177,7 +185,7 @@ public class User : Entity
         string email, 
         bool emailConfirmed, 
         string phoneNumber, 
-        bool phoneNumberConfirmed, 
+        bool? phoneNumberConfirmed, 
         bool twoFactoryEnabled, 
         DateTime? lockOutEnd, 
         bool lockOutEnabled, 
@@ -200,6 +208,23 @@ public class User : Entity
 
         if (name.Contains(" "))
             throw new GenericCoreException($"{nameof(name)} must not have spaces.");
+
+        if (email.Length < MIN_CHAR_USERNAME_AND_EMAIL ||
+            email.Length > MAX_CHAR_USERNAME_AND_EMAIL)
+            throw new GenericCoreException($"{nameof(email)} must have a length between {MIN_CHAR_USERNAME_AND_EMAIL} and {MAX_CHAR_USERNAME_AND_EMAIL}.");
+
+        if (phoneNumber is not null &&
+            (phoneNumber.Length < MIN_CHAR_PHONE ||
+            phoneNumber.Length > MAX_CHAR_PHONE))
+            throw new GenericCoreException($"{nameof(phoneNumber)} must have a length between {MIN_CHAR_PHONE} and {MAX_CHAR_PHONE}.");
+        
+        if (name.Length < MIN_CHAR_NAME ||
+            name.Length > MAX_CHAR_NAME)
+            throw new GenericCoreException($"{nameof(name)} must have a length between {MIN_CHAR_NAME} and {MAX_CHAR_NAME}.");
+        
+        if (lastName.Length < MIN_CHAR_LAST_NAME ||
+            lastName.Length > MAX_CHAR_LAST_NAME)
+            throw new GenericCoreException($"{nameof(lastName)} must have a length between {MIN_CHAR_LAST_NAME} and {MAX_CHAR_LAST_NAME}.");
     }
 
     
