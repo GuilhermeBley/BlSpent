@@ -44,7 +44,6 @@ public class User : Entity
     }
 
     public static User Create(
-        Guid id,
         string email, 
         bool emailConfirmed, 
         string phoneNumber, 
@@ -56,8 +55,7 @@ public class User : Entity
         string name, 
         string lastName)
     {
-        if (Guid.Empty == id)
-            throw new GenericCoreException($"{nameof(id)} can't be empty.");
+        var id = Guid.NewGuid();
 
         CheckFields(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, twoFactoryEnabled, 
             lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName);

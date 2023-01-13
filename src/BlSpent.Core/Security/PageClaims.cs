@@ -10,7 +10,7 @@ public static class PageClaims
     /// <summary>
     /// PageRule
     /// </summary>
-    public const string Type = "PageRule";
+    public const string Type = nameof(PageClaims);
 
     /// <summary>
     /// UserClaim | Owner
