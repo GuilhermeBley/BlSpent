@@ -128,7 +128,7 @@ public class User : Entity
 
         if (!this.Email.Equals(user.Email) ||
             !this.EmailConfirmed.Equals(user.EmailConfirmed) ||
-            !this.PhoneNumber.Equals(user.PhoneNumber) ||
+            this.PhoneNumber != user.PhoneNumber ||
             !this.PhoneNumberConfirmed.Equals(user.PhoneNumberConfirmed) ||
             !this.TwoFactoryEnabled.Equals(user.TwoFactoryEnabled) ||
             !this.LockOutEnd.Equals(user.LockOutEnd) ||
@@ -184,7 +184,7 @@ public class User : Entity
     private static void CheckFields(
         string email, 
         bool emailConfirmed, 
-        string phoneNumber, 
+        string? phoneNumber, 
         bool? phoneNumberConfirmed, 
         bool twoFactoryEnabled, 
         DateTime? lockOutEnd, 
