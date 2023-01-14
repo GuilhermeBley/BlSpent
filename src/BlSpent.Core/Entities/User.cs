@@ -20,8 +20,8 @@ public class User : Entity
     public string ALLOWED_CHAR_PASSWORD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*#?&";
     public const string PATTERN_REGEX_PASSWORD = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,100}$";
 
-    private static UnauthorizedCoreException CreateInvalidPasswordCoreException =>
-        new UnauthorizedCoreException($"Invalid password. Passwords must have at least one letter, one number, one symbol and in total 8 characters of length.");
+    private static GenericCoreException CreateInvalidPasswordCoreException =>
+        new GenericCoreException($"Invalid password. Passwords must have at least one letter, one number, one symbol and in total 8 characters of length.");
 
     /// <summary>
     /// Identifier
@@ -84,6 +84,11 @@ public class User : Entity
     public string LastName { get; private set; }
 
     /// <summary>
+    /// Password
+    /// </summary>
+    public char[] Password { get; private set; }
+
+    /// <summary>
     /// Private instance
     /// </summary>
     /// <param name="id"><inheritdoc cref="Id" path="/summary"/></param>
@@ -108,7 +113,8 @@ public class User : Entity
         bool lockOutEnabled, 
         int accessFailedCount, 
         string name, 
-        string lastName)
+        string lastName,
+        char[] password)
     {
         Id = id;
         Email = email;
@@ -121,6 +127,7 @@ public class User : Entity
         AccessFailedCount = accessFailedCount;
         Name = name;
         LastName = lastName;
+        Password = password;
     }
 
     
@@ -136,6 +143,7 @@ public class User : Entity
         if (!this.Email.Equals(user.Email) ||
             !this.EmailConfirmed.Equals(user.EmailConfirmed) ||
             this.PhoneNumber != user.PhoneNumber ||
+            !this.Password.Equals(user.Password) ||
             !this.PhoneNumberConfirmed.Equals(user.PhoneNumberConfirmed) ||
             !this.TwoFactoryEnabled.Equals(user.TwoFactoryEnabled) ||
             !this.LockOutEnd.Equals(user.LockOutEnd) ||
@@ -177,15 +185,19 @@ public class User : Entity
         bool lockOutEnabled, 
         int accessFailedCount, 
         string name, 
-        string lastName)
+        string lastName,
+        char[] password)
     {
         var id = Guid.NewGuid();
 
         CheckFields(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, twoFactoryEnabled, 
             lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName);
 
+        if (!IsValidPassword(password))
+            throw CreateInvalidPasswordCoreException;
+
         return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
-            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim());
+            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), password);
     }
 
     private static void CheckFields(
@@ -256,20 +268,20 @@ public class User : Entity
     }
 
     /// <summary>
-    /// Check if is valid password, if invalid, throw <see cref="UnauthorizedAccessException"/>
+    /// Check if is valid password, if invalid, throw <see cref="GenericCoreException"/>
     /// </summary>
     /// <param name="password">password to check</param>
-    /// <exception cref="UnauthorizedCoreException"></exception>
+    /// <exception cref="GenericCoreException"></exception>
     public static void ThrowIfIsInvalidPassword(params char[] password)
     {
         ThrowIfIsInvalidPassword(new string(password));
     }
     
     /// <summary>
-    /// Check if is valid password, if invalid, throw <see cref="UnauthorizedAccessException"/>
+    /// Check if is valid password, if invalid, throw <see cref="GenericCoreException"/>
     /// </summary>
     /// <param name="password">password to check</param>
-    /// <exception cref="UnauthorizedCoreException"></exception>
+    /// <exception cref="GenericCoreException"></exception>
     public static void ThrowIfIsInvalidPassword(string password)
     {
         if (!IsValidPassword(password))
