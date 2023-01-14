@@ -15,6 +15,13 @@ public class User : Entity
     public const int MAX_CHAR_NAME = 100;
     public const int MIN_CHAR_LAST_NAME = 1;
     public const int MAX_CHAR_LAST_NAME = 255;
+    public const int MIN_CHAR_PASSWORD = 8;
+    public const int MAX_CHAR_PASSWORD = 100;
+    public string ALLOWED_CHAR_PASSWORD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*#?&";
+    public const string PATTERN_REGEX_PASSWORD = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,100}$";
+
+    private static UnauthorizedCoreException CreateInvalidPasswordCoreException =>
+        new UnauthorizedCoreException($"Invalid password. Passwords must have at least one letter, one number, one symbol and in total 8 characters of length.");
 
     /// <summary>
     /// Identifier
@@ -226,6 +233,46 @@ public class User : Entity
             lastName.Length > MAX_CHAR_LAST_NAME)
             throw new GenericCoreException($"{nameof(lastName)} must have a length between {MIN_CHAR_LAST_NAME} and {MAX_CHAR_LAST_NAME}.");
     }
-
     
+    /// <summary>
+    /// Check if is valid password, if invalid, return false.
+    /// </summary>
+    /// <param name="password">password to check</param>
+    public static bool IsValidPassword(params char[] password)
+    {
+        return IsValidPassword(new string(password));
+    }
+
+    /// <summary>
+    /// Check if is valid password, if invalid, return false.
+    /// </summary>
+    /// <param name="password">password to check</param>
+    public static bool IsValidPassword(string password)
+    {
+        if (System.Text.RegularExpressions.Regex.IsMatch(password, PATTERN_REGEX_PASSWORD))
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Check if is valid password, if invalid, throw <see cref="UnauthorizedAccessException"/>
+    /// </summary>
+    /// <param name="password">password to check</param>
+    /// <exception cref="UnauthorizedCoreException"></exception>
+    public static void ThrowIfIsInvalidPassword(params char[] password)
+    {
+        ThrowIfIsInvalidPassword(new string(password));
+    }
+    
+    /// <summary>
+    /// Check if is valid password, if invalid, throw <see cref="UnauthorizedAccessException"/>
+    /// </summary>
+    /// <param name="password">password to check</param>
+    /// <exception cref="UnauthorizedCoreException"></exception>
+    public static void ThrowIfIsInvalidPassword(string password)
+    {
+        if (!IsValidPassword(password))
+            throw CreateInvalidPasswordCoreException;
+    }
 }
