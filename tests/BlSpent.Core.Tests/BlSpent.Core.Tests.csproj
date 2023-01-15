@@ -21,4 +21,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BlSpent.Core\BlSpent.Core.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -174,6 +174,7 @@ public class User : Entity
     /// <param name="accessFailedCount"><inheritdoc cref="AccessFailedCount" path="/summary"/></param>
     /// <param name="name"><inheritdoc cref="Name" path="/summary"/></param>
     /// <param name="lastName"><inheritdoc cref="LastName" path="/summary"/></param>
+    /// <param name="password"><inheritdoc cref="Password" path="/summary"/></param>
     /// <returns>new <see cref="User"/></returns>
     public static User Create(
         string email, 
@@ -198,6 +199,24 @@ public class User : Entity
 
         return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
             twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), password);
+    }
+
+    /// <inheritdoc cref="Create(string, bool, string?, bool, bool, DateTime?, bool, int, string, string, char[])" path="*"/>
+    public static User Create(
+        string email, 
+        bool emailConfirmed, 
+        string? phoneNumber, 
+        bool phoneNumberConfirmed, 
+        bool twoFactoryEnabled, 
+        DateTime? lockOutEnd, 
+        bool lockOutEnabled, 
+        int accessFailedCount, 
+        string name, 
+        string lastName,
+        string password)
+    {
+        return Create(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, 
+            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName, password.ToCharArray());
     }
 
     private static void CheckFields(
@@ -234,8 +253,9 @@ public class User : Entity
 
         if (phoneNumber is not null &&
             (phoneNumber.Length < MIN_CHAR_PHONE ||
-            phoneNumber.Length > MAX_CHAR_PHONE))
-            throw new GenericCoreException($"{nameof(phoneNumber)} must have a length between {MIN_CHAR_PHONE} and {MAX_CHAR_PHONE}.");
+            phoneNumber.Length > MAX_CHAR_PHONE ||
+            phoneNumber.All(char.IsNumber)))
+            throw new GenericCoreException($"{nameof(phoneNumber)} must have only numbers, and a length between {MIN_CHAR_PHONE} and {MAX_CHAR_PHONE}.");
         
         if (name.Length < MIN_CHAR_NAME ||
             name.Length > MAX_CHAR_NAME)
