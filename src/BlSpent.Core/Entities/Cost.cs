@@ -80,6 +80,6 @@ public class Cost : Entity
         if (pageId.Equals(Guid.Empty))
             throw new GenericCoreException("Invalid pageId. Guid Empty.");
             
-        return new Cost(costDate, new BaseDate(costDate), ((byte)value), pageId);
+        return new Cost(costDate, new BaseDate(costDate), value, pageId);
     }
 }
