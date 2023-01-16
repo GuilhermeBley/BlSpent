@@ -6,17 +6,33 @@ namespace BlSpent.Application.Security.Internal;
 
 internal static class SecurityChecker
 {
+    /// <summary>
+    /// Check with <see cref="IsLogged(ClaimModel?)"/>
+    /// </summary>
+    /// <param name="claimModel">claim model</param>
+    /// <exception cref="UnauthorizedCoreException"></exception>
     public static void ThrowIfIsntLogged(this ClaimModel? claimModel)
     {
         if (!IsLogged(claimModel))
             throw new UnauthorizedCoreException();
     }
 
+    /// <summary>
+    /// Check with <see cref="IsAuthorizedInPage(ClaimModel?)"/>
+    /// </summary>
+    /// <param name="claimModel">claim model</param>
+    /// <exception cref="ForbiddenCoreException"></exception>
     public static void ThrowIfIsntAuthorizedInPage(this ClaimModel? claimModel)
     {
         if (!IsAuthorizedInPage(claimModel))
             throw new ForbiddenCoreException("Page not allowed.");
     }
+
+    /// <summary>
+    /// Check with <see cref="CanRead(ClaimModel?)"/>
+    /// </summary>
+    /// <param name="claimModel">claim model</param>
+    /// <exception cref="ForbiddenCoreException"></exception>
 
     public static void ThrowIfCantRead(this ClaimModel? claimModel)
     {
@@ -24,11 +40,22 @@ internal static class SecurityChecker
             throw new ForbiddenCoreException("Read not allowed.");
     }
 
+    /// <summary>
+    /// Check with <see cref="CanModify(ClaimModel?)"/>
+    /// </summary>
+    /// <param name="claimModel">claim model</param>
+    /// <exception cref="ForbiddenCoreException"></exception>
     public static void ThrowIfCantModify(this ClaimModel? claimModel)
     {
         if (!CanModify(claimModel))
             throw new ForbiddenCoreException("Modifications not allowed.");
     }
+
+    /// <summary>
+    /// Check with <see cref="IsOwner(ClaimModel?)"/>
+    /// </summary>
+    /// <param name="claimModel">claim model</param>
+    /// <exception cref="ForbiddenCoreException"></exception>
 
     public static void ThrowIfIsntOwner(this ClaimModel? claimModel)
     {
@@ -36,7 +63,11 @@ internal static class SecurityChecker
             throw new ForbiddenCoreException("Only owners can access this resource.");;
     }
 
-
+    /// <summary>
+    /// Checks if is logged
+    /// </summary>
+    /// <param name="claimModel">claim model to check</param>
+    /// <returns>true is logged, otherwise, isn't</returns>
     public static bool IsLogged(this ClaimModel? claimModel)
     {
         if (claimModel is null ||
@@ -47,6 +78,11 @@ internal static class SecurityChecker
         return true;
     }
 
+    /// <summary>
+    /// Checks if is logged and if is authorized in page
+    /// </summary>
+    /// <param name="claimModel">claim model to check</param>
+    /// <returns>true is authorized in page, otherwise, isn't</returns>
     public static bool IsAuthorizedInPage(this ClaimModel? claimModel)
     {
         if (claimModel is null ||
@@ -59,6 +95,11 @@ internal static class SecurityChecker
         return true;
     }
 
+    /// <summary>
+    /// Checks if is authorized in page and if can read it
+    /// </summary>
+    /// <param name="claimModel">claim model to check</param>
+    /// <returns>true can read page, otherwise, can't</returns>
     public static bool CanRead(this ClaimModel? claimModel)
     {
         if (claimModel is null ||
@@ -74,6 +115,11 @@ internal static class SecurityChecker
         return true;
     }
 
+    /// <summary>
+    /// Checks if can read page and if can modify it
+    /// </summary>
+    /// <param name="claimModel">claim model to check</param>
+    /// <returns>true can modify page, otherwise, can't</returns>
     public static bool CanModify(this ClaimModel? claimModel)
     {
         if (claimModel is null ||
@@ -88,6 +134,11 @@ internal static class SecurityChecker
         return true;
     }
 
+    /// <summary>
+    /// Checks if is owner of the page
+    /// </summary>
+    /// <param name="claimModel">claim model to check</param>
+    /// <returns>true is owner, otherwise, isn't</returns>
     public static bool IsOwner(this ClaimModel? claimModel)
     {
         if (claimModel is null ||
