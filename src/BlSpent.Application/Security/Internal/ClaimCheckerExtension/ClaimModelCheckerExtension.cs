@@ -2,9 +2,9 @@ using BlSpent.Application.Model;
 using BlSpent.Core.Exceptions;
 using BlSpent.Core.Security;
 
-namespace BlSpent.Application.Security.Internal;
+namespace BlSpent.Application.Security.Internal.ClaimCheckerExtension;
 
-internal static class SecurityChecker
+internal static class ClaimModelCheckerExtension
 {
     /// <summary>
     /// Check with <see cref="IsLogged(ClaimModel?)"/>
