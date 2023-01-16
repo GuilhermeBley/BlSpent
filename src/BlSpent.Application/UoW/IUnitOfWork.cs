@@ -3,6 +3,12 @@ namespace BlSpent.Application.UoW;
 public interface IUnitOfWork : IDisposable
 {
     Guid IdSession { get; }
+    
+    /// <summary>
+    /// Necessary to create and open a new connection
+    /// </summary>
+    /// <returns><see cref="Task"/> result of <see cref="IUnitOfWork"/> opened</returns>
+    Task<IUnitOfWork> OpenConnectionAsync();
 
     /// <summary>
     /// Creates a connection (if method <see cref="OpenConnectionAsync"/> haven't executed) and transaction
