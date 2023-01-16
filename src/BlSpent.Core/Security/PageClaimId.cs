@@ -5,12 +5,12 @@ namespace BlSpent.Core.Security;
 /// <summary>
 /// Page claims
 /// </summary>
-public static class PageClaimsId
+public static class PageClaimId
 {
     /// <summary>
     /// PageRule
     /// </summary>
-    public const string Type = nameof(PageClaimsId);
+    public const string Type = nameof(PageClaimId);
 
     /// <summary>
     /// Create with pageId
