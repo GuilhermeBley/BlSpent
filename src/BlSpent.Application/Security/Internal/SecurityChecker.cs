@@ -6,12 +6,6 @@ namespace BlSpent.Application.Security.Internal;
 
 internal static class SecurityChecker
 {
-    private static UnauthorizedCoreException CreateUnauthorizedException =>
-        new();
-        
-    private static ForbiddenCoreException CreateForbiddenException =>
-        new();
-
     public static void ThrowIfIsntLogged(this ClaimModel? claimModel)
     {
         if (!IsLogged(claimModel))
