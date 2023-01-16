@@ -17,7 +17,7 @@ public class User : Entity
     public const int MAX_CHAR_LAST_NAME = 255;
     public const int MIN_CHAR_PASSWORD = 8;
     public const int MAX_CHAR_PASSWORD = 100;
-    public string ALLOWED_CHAR_PASSWORD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*#?&";
+    public const string ALLOWED_CHAR_PASSWORD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*#?& ";
     public const string PATTERN_REGEX_PASSWORD = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,100}$";
 
     private static GenericCoreException CreateInvalidPasswordCoreException =>
@@ -283,6 +283,9 @@ public class User : Entity
     {
         if (System.Text.RegularExpressions.Regex.IsMatch(password, PATTERN_REGEX_PASSWORD))
             return true;
+
+        if (password.Any(c => !ALLOWED_CHAR_PASSWORD.Contains(c)))
+            throw new GenericCoreException($"Invalid character found in password. Is allowed only '{ALLOWED_CHAR_PASSWORD}'.");
 
         return false;
     }

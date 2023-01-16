@@ -9,6 +9,10 @@ namespace BlSpent.Core.Entities;
 /// </remarks>
 public class Page : Entity
 {
+    public const int MIN_LENGTH_PAGE_NAME = 2;
+    public const int MAX_LENGTH_PAGE_NAME = 255;
+    public const string ALLOWED_CHAR_PAGE_NAME = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ";
+
     /// <summary>
     /// Identifier
     /// </summary>
@@ -17,7 +21,7 @@ public class Page : Entity
     /// <summary>
     /// Owner user
     /// </summary>
-    public Guid OwnerUserId { get; }
+    public string PageName { get; }
 
     /// <summary>
     /// Create date of page
@@ -33,13 +37,13 @@ public class Page : Entity
     /// Private instance
     /// </summary>
     /// <param name="id"><inheritdoc cref="Id" path="/summary"/></param>
-    /// <param name="ownerUserId"><inheritdoc cref="OwnerUserId" path="/summary"/></param>
+    /// <param name="pageName"><inheritdoc cref="PageName" path="/summary"/></param>
     /// <param name="createDate"><inheritdoc cref="CreateDate" path="/summary"/></param>
     /// <param name="concurrencyStamp"><inheritdoc cref="ConcurrencyStamp" path="/summary"/></param>
-    private Page(Guid id, Guid ownerUserId, DateTime createDate, Guid concurrencyStamp)
+    private Page(Guid id, string pageName, DateTime createDate, Guid concurrencyStamp)
     {
         Id = id;
-        OwnerUserId = ownerUserId;
+        PageName = pageName;
         CreateDate = createDate;
         ConcurrencyStamp = concurrencyStamp;
     }
@@ -53,7 +57,7 @@ public class Page : Entity
         if (page is null)
             return false;
 
-        if (!this.OwnerUserId.Equals(page.OwnerUserId) ||
+        if (!this.PageName.Equals(page.PageName) ||
             !this.CreateDate.Equals(page.CreateDate) ||
             !this.ConcurrencyStamp.Equals(page.ConcurrencyStamp))
             return false;
@@ -69,16 +73,22 @@ public class Page : Entity
     /// <summary>
     /// Creates new <see cref="Page"/>
     /// </summary>
-    /// <param name="ownerUserId"><inheritdoc cref="OwnerUserId" path="/summary"/></param>
+    /// <param name="pageName"><inheritdoc cref="PageName" path="/summary"/></param>
     /// <returns>new <see cref="Page"/></returns>
     /// <exception cref="GenericCoreException"></exception>
-    public static Page Create(Guid ownerUserId)
+    public static Page Create(string pageName)
     {
         var id = Guid.NewGuid();
 
-        if (ownerUserId.Equals(Guid.Empty))
-            throw new GenericCoreException("Invalid OwnerUser. Guid Empty.");
+        if (string.IsNullOrWhiteSpace(pageName))
+            throw new GenericCoreException("Invalid page name. It is null or white space.");
+        
+        if (pageName.Length is < MIN_LENGTH_PAGE_NAME or > MAX_LENGTH_PAGE_NAME)
+            throw new GenericCoreException($"Invalid legth page name. It must have between {MIN_LENGTH_PAGE_NAME} and {MAX_LENGTH_PAGE_NAME} of size.");
 
-        return new Page(Guid.NewGuid(), ownerUserId, DateTime.Now, Guid.NewGuid());
+        if (pageName.Any(c => !ALLOWED_CHAR_PAGE_NAME.Contains(c)))
+            throw new GenericCoreException($"Invalid character found in page name. Is allowed only '{ALLOWED_CHAR_PAGE_NAME}'.");
+
+        return new Page(Guid.NewGuid(), pageName.Trim(), DateTime.Now, Guid.NewGuid());
     }
 }

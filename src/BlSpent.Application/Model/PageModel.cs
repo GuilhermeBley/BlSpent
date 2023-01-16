@@ -13,7 +13,7 @@ public class PageModel
     /// <summary>
     /// Owner user
     /// </summary>
-    public Guid OwnerUserId { get; set; }
+    public string PageName { get; set; } = string.Empty;
 
     /// <summary>
     /// Create date of page
