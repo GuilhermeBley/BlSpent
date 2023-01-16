@@ -1,9 +1,9 @@
 namespace BlSpent.Application.Model;
 
 /// <summary>
-/// Model of <see cref="BlSpent.Core.Entities.GuestPage"/>
+/// Model of <see cref="BlSpent.Core.Entities.RolePage"/>
 /// </summary>
-public class GuestPageModel
+public class RolePageModel
 {
     /// <summary>
     /// Id

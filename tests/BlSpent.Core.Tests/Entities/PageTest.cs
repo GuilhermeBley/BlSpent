@@ -22,8 +22,7 @@ public class PageTest
     public void Create_TryCreateWithEmptyGuid_Failed()
     {
         Assert.ThrowsAny<CoreException>(
-            () => Page.Create(@"Invalid Name
-            ")
+            () => Page.Create(@"Invalid Name\n")
         );
     }
 }

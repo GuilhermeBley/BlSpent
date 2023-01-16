@@ -13,6 +13,12 @@ public static class PageClaim
     public const string Type = nameof(PageClaim);
 
     /// <summary>
+    /// Available roles
+    /// </summary>
+    public static IEnumerable<string> AvailableRoles =>
+        new Claim[] { Owner, ReadOnly, Modifier }.Select(claim => claim.Value);
+
+    /// <summary>
     /// UserClaim | Owner
     /// </summary>
     public static Claim Owner { get; } = new Claim(Type, "Owner");
