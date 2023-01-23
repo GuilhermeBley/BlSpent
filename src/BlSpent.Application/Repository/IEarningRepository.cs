@@ -5,5 +5,5 @@ namespace BlSpent.Application.Repository;
 
 public interface IEarningRepository : IBaseRepository<Earning, EarningModel, Guid>
 {
-    IAsyncEnumerable<CostModel> GetByPageId(Guid pageId);
+    IAsyncEnumerable<EarningModel> GetByPageId(Guid pageId);
 }
