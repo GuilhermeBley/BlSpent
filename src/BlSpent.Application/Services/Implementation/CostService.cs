@@ -3,6 +3,7 @@ using BlSpent.Core.Entities;
 using BlSpent.Application.Services.Interfaces;
 using BlSpent.Application.UoW;
 using BlSpent.Application.Repository;
+using BlSpent.Application.Exceptions;
 
 namespace BlSpent.Application.Services.Implementation;
 
@@ -10,35 +11,67 @@ public class CostService : ICostService
 {
     private readonly IUnitOfWork _uow;
     private readonly ICostRepository _costRepository;
+    private readonly IPageRepository _pageRepository;
 
-    public CostService(IUnitOfWork uow, ICostRepository costRepository)
+    public CostService(IUnitOfWork uow, 
+        ICostRepository costRepository, IPageRepository pageRepository)
     {
         _uow = uow;
         _costRepository = costRepository;
+        _pageRepository = pageRepository;
     }
 
-    public Task<CostModel> Add(Cost entity)
+    public async Task<CostModel> Add(Cost entity)
     {
-        throw new NotImplementedException();
+        using var transaction = await _uow.BeginTransactionAsync();
+
+        if ((await _pageRepository.GetByIdOrDefault(entity.PageId)) is null)
+            throw new PageNotFoundCoreException(entity.PageId);
+
+        return await _costRepository.Add(entity);
     }
 
-    public Task<CostModel?> GetByIdOrDefault(Guid id)
+    public async Task<CostModel?> GetByIdOrDefault(Guid id)
     {
-        throw new NotImplementedException();
+        using var transaction = await _uow.OpenConnectionAsync();
+        return await _costRepository.GetByIdOrDefault(id);
     }
 
-    public IAsyncEnumerable<CostModel> GetByPageId(Guid pageId)
+    public async IAsyncEnumerable<CostModel> GetByPageId(Guid pageId)
     {
-        throw new NotImplementedException();
+        if (Guid.Empty == pageId)
+            yield break;
+
+        using (await _uow.OpenConnectionAsync())
+            await foreach (var cost in _costRepository.GetByPageId(pageId))
+            {
+                yield return cost;
+            }
     }
 
-    public Task<CostModel?> RemoveByIdOrDefault(Guid id)
+    public async Task<CostModel?> RemoveByIdOrDefault(Guid id)
     {
-        throw new NotImplementedException();
+        if (Guid.Empty == id)
+            return null;
+
+        using var transaction = await _uow.BeginTransactionAsync();
+
+        if ((await _costRepository.GetByIdOrDefault(id)) is null)
+            return null;
+
+        return await _costRepository.RemoveByIdOrDefault(id);
     }
 
-    public Task<CostModel?> UpdateByIdOrDefault(Guid id, Cost entity)
+    public async Task<CostModel?> UpdateByIdOrDefault(Guid id, Cost entity)
     {
-        throw new NotImplementedException();
+         if (Guid.Empty == id)
+            return null;
+
+        using var transaction = await _uow.BeginTransactionAsync();
+
+        if ((await _costRepository.GetByIdOrDefault(id)) is null)
+            return null;
+
+        return await _costRepository.UpdateByIdOrDefault(id, entity);
     }
 }
