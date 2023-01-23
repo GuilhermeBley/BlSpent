@@ -3,7 +3,7 @@ using BlSpent.Application.Model;
 
 namespace BlSpent.Application.Repository;
 
-public interface IEarningRepository : IBaseRepository<Earning, EarningModel, Guid>
+public interface IEarningRepository : IBaseRepository<EarningModel, Earning, Guid>
 {
     IAsyncEnumerable<EarningModel> GetByPageId(Guid pageId);
 }
