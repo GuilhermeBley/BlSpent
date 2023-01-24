@@ -5,7 +5,7 @@ namespace BlSpent.Application.Services.Interfaces;
 
 public interface IEarningService
 {
-    public Task<EarningModel> Add(Earning entity);
+    public Task<EarningModel> Add(EarningModel model);
 
     public Task<EarningModel?> GetByIdOrDefault(Guid id);
 
@@ -13,5 +13,5 @@ public interface IEarningService
 
     public Task<EarningModel?> RemoveByIdOrDefault(Guid id);
 
-    public Task<EarningModel?> UpdateByIdOrDefault(Guid id, Earning entity);
+    public Task<EarningModel?> UpdateByIdOrDefault(Guid id, EarningModel model);
 }
