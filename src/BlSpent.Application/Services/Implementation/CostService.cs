@@ -28,7 +28,7 @@ public class CostService : ICostService
         if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
             throw new PageNotFoundCoreException(model.PageId);
 
-        return await _costRepository.Add(model);
+        return await _costRepository.Add(Mappings.Mapper.Map(model));
     }
 
     public async Task<CostModel?> GetByIdOrDefault(Guid id)
@@ -72,6 +72,6 @@ public class CostService : ICostService
         if ((await _costRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _costRepository.UpdateByIdOrDefault(id, model);
+        return await _costRepository.UpdateByIdOrDefault(id, Mappings.Mapper.Map(model));
     }
 }

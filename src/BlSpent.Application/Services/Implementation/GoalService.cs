@@ -28,7 +28,7 @@ public class GoalService : IGoalService
         if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
             throw new PageNotFoundCoreException(model.PageId);
 
-        return await _goalRepository.Add(model);
+        return await _goalRepository.Add(Mappings.Mapper.Map(model));
     }
 
     public async Task<GoalModel?> GetByIdOrDefault(Guid id)
@@ -72,6 +72,6 @@ public class GoalService : IGoalService
         if ((await _goalRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _goalRepository.UpdateByIdOrDefault(id, model);
+        return await _goalRepository.UpdateByIdOrDefault(id, Mappings.Mapper.Map(model));
     }
 }

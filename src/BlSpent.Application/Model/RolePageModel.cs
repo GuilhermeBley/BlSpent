@@ -21,6 +21,11 @@ public class RolePageModel
     public Guid PageId { get; set; }
 
     /// <summary>
+    /// Role page
+    /// </summary>
+    public string Role { get; set; } = string.Empty;
+
+    /// <summary>
     /// Create date of guest
     /// </summary>
     public DateTime CreateDate { get; set; }
