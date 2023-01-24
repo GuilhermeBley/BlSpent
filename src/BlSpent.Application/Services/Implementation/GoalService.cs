@@ -21,14 +21,14 @@ public class GoalService : IGoalService
         _pageRepository = pageRepository;
     }
 
-    public async Task<GoalModel> Add(Goal entity)
+    public async Task<GoalModel> Add(GoalModel model)
     {
         using var transaction = await _uow.BeginTransactionAsync();
 
-        if ((await _pageRepository.GetByIdOrDefault(entity.PageId)) is null)
-            throw new PageNotFoundCoreException(entity.PageId);
+        if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
+            throw new PageNotFoundCoreException(model.PageId);
 
-        return await _goalRepository.Add(entity);
+        return await _goalRepository.Add(model);
     }
 
     public async Task<GoalModel?> GetByIdOrDefault(Guid id)
@@ -62,7 +62,7 @@ public class GoalService : IGoalService
         return await _goalRepository.RemoveByIdOrDefault(id);
     }
 
-    public async Task<GoalModel?> UpdateByIdOrDefault(Guid id, Goal entity)
+    public async Task<GoalModel?> UpdateByIdOrDefault(Guid id, GoalModel model)
     {
          if (Guid.Empty == id)
             return null;
@@ -72,6 +72,6 @@ public class GoalService : IGoalService
         if ((await _goalRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _goalRepository.UpdateByIdOrDefault(id, entity);
+        return await _goalRepository.UpdateByIdOrDefault(id, model);
     }
 }

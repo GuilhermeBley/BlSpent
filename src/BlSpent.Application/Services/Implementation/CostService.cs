@@ -21,14 +21,14 @@ public class CostService : ICostService
         _pageRepository = pageRepository;
     }
 
-    public async Task<CostModel> Add(Cost entity)
+    public async Task<CostModel> Add(CostModel model)
     {
         using var transaction = await _uow.BeginTransactionAsync();
 
-        if ((await _pageRepository.GetByIdOrDefault(entity.PageId)) is null)
-            throw new PageNotFoundCoreException(entity.PageId);
+        if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
+            throw new PageNotFoundCoreException(model.PageId);
 
-        return await _costRepository.Add(entity);
+        return await _costRepository.Add(model);
     }
 
     public async Task<CostModel?> GetByIdOrDefault(Guid id)
@@ -62,7 +62,7 @@ public class CostService : ICostService
         return await _costRepository.RemoveByIdOrDefault(id);
     }
 
-    public async Task<CostModel?> UpdateByIdOrDefault(Guid id, Cost entity)
+    public async Task<CostModel?> UpdateByIdOrDefault(Guid id, CostModel model)
     {
          if (Guid.Empty == id)
             return null;
@@ -72,6 +72,6 @@ public class CostService : ICostService
         if ((await _costRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _costRepository.UpdateByIdOrDefault(id, entity);
+        return await _costRepository.UpdateByIdOrDefault(id, model);
     }
 }

@@ -21,14 +21,14 @@ public class EarningService : IEarningService
         _pageRepository = pageRepository;
     }
 
-    public async Task<EarningModel> Add(Earning entity)
+    public async Task<EarningModel> Add(EarningModel model)
     {
         using var transaction = await _uow.BeginTransactionAsync();
 
-        if ((await _pageRepository.GetByIdOrDefault(entity.PageId)) is null)
-            throw new PageNotFoundCoreException(entity.PageId);
+        if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
+            throw new PageNotFoundCoreException(model.PageId);
 
-        return await _earningRepository.Add(entity);
+        return await _earningRepository.Add(model);
     }
 
     public async Task<EarningModel?> GetByIdOrDefault(Guid id)
@@ -62,7 +62,7 @@ public class EarningService : IEarningService
         return await _earningRepository.RemoveByIdOrDefault(id);
     }
 
-    public async Task<EarningModel?> UpdateByIdOrDefault(Guid id, Earning entity)
+    public async Task<EarningModel?> UpdateByIdOrDefault(Guid id, EarningModel model)
     {
          if (Guid.Empty == id)
             return null;
@@ -72,6 +72,6 @@ public class EarningService : IEarningService
         if ((await _earningRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _earningRepository.UpdateByIdOrDefault(id, entity);
+        return await _earningRepository.UpdateByIdOrDefault(id, model);
     }
 }
