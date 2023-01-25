@@ -16,7 +16,9 @@ public class UserTests
                 accessFailedCount: 0,
                 name: "teste",
                 lastName: "teste1 teste2",
-                password: "teste@123");
+                password: "teste@123",
+                string.Empty,
+                string.Empty);
 
         Assert.NotNull(user);
     }
@@ -36,7 +38,9 @@ public class UserTests
                 accessFailedCount: 0, 
                 name: "teste", 
                 lastName: "teste1 teste2", 
-                password: "teste")
+                password: "teste",
+                string.Empty,
+                string.Empty)
         );
     }
     
@@ -55,7 +59,9 @@ public class UserTests
                 accessFailedCount: 0, 
                 name: "teste", 
                 lastName: "teste1 teste2", 
-                password: "teste")
+                password: "teste",
+                string.Empty,
+                string.Empty)
         );
     }
     
@@ -74,7 +80,9 @@ public class UserTests
                 accessFailedCount: 0, 
                 name: "teste", 
                 lastName: "teste1 teste2", 
-                password: "teste")
+                password: "teste",
+                string.Empty,
+                string.Empty)
         );
     }
 
@@ -92,7 +100,9 @@ public class UserTests
                 accessFailedCount: 0,
                 name: "user1",
                 lastName: "teste1 teste2",
-                password: "user1@123");
+                password: "user1@123",
+                string.Empty,
+                string.Empty);
 
         var user2 = User.Create(
             email: "user2@email.com",
@@ -105,7 +115,9 @@ public class UserTests
             accessFailedCount: 0,
             name: "user2",
             lastName: "teste2 teste2",
-            password: "user2@123");
+            password: "user2@123",
+            string.Empty,
+            string.Empty);
 
         Assert.False(user1.Equals(user2));
     }
@@ -124,7 +136,9 @@ public class UserTests
             accessFailedCount: 0,
             name: "user1",
             lastName: "teste1 teste2",
-            password: "user1@123");
+            password: "user1@123",
+            string.Empty,
+            string.Empty);
 
         Assert.True(user1.Equals(user1));
     }
