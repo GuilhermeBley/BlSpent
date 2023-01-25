@@ -88,6 +88,9 @@ public class User : Entity
     /// </summary>
     public char[] Password { get; private set; }
 
+    public string PasswordHash { get; private set; }
+    public string PasswordSalt { get; private set; }
+
     /// <summary>
     /// Private instance
     /// </summary>
@@ -114,7 +117,9 @@ public class User : Entity
         int accessFailedCount, 
         string name, 
         string lastName,
-        char[] password)
+        char[] password,
+        string passwordHash,
+        string passwordSalt)
     {
         Id = id;
         Email = email;
@@ -128,6 +133,8 @@ public class User : Entity
         Name = name;
         LastName = lastName;
         Password = password;
+        PasswordHash = passwordHash;
+        PasswordSalt = passwordSalt;
     }
 
     
@@ -187,7 +194,9 @@ public class User : Entity
         int accessFailedCount, 
         string name, 
         string lastName,
-        char[] password)
+        char[] password,
+        string passwordHash,
+        string passwordSalt)
     {
         var id = Guid.NewGuid();
 
@@ -198,7 +207,8 @@ public class User : Entity
             throw CreateInvalidPasswordCoreException;
 
         return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
-            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), password);
+            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), 
+            password, passwordHash, passwordSalt);
     }
 
     /// <inheritdoc cref="Create(string, bool, string?, bool, bool, DateTime?, bool, int, string, string, char[])" path="*"/>
@@ -213,10 +223,13 @@ public class User : Entity
         int accessFailedCount, 
         string name, 
         string lastName,
-        string password)
+        string password,
+        string passwordHash,
+        string passwordSalt)
     {
         return Create(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, 
-            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName, password.ToCharArray());
+            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName, 
+            password.ToCharArray(), passwordHash, passwordSalt);
     }
 
     private static void CheckFields(
