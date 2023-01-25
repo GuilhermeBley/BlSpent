@@ -32,6 +32,6 @@ internal static class Mapper
         return Core.Entities.User.Create(model.Email, model.EmailConfirmed, 
             model.PhoneNumber, model.PhoneNumberConfirmed, model.TwoFactoryEnabled, 
             model.LockOutEnd, model.LockOutEnabled, model.AccessFailedCount, model.Name, 
-            model.LastName, model.Password);
+            model.LastName, model.Password, model.PasswordHash, model.Salt);
     }
 }
