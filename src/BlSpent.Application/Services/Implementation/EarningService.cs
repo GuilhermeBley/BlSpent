@@ -1,5 +1,4 @@
 using BlSpent.Application.Model;
-using BlSpent.Core.Entities;
 using BlSpent.Application.Services.Interfaces;
 using BlSpent.Application.UoW;
 using BlSpent.Application.Repository;
