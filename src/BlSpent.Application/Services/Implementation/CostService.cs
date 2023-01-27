@@ -28,7 +28,11 @@ public class CostService : ICostService
         if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
             throw new PageNotFoundCoreException(model.PageId);
 
-        return await _costRepository.Add(Mappings.Mapper.Map(model));
+        var costAdded = await _costRepository.Add(Mappings.Mapper.Map(model));
+
+        await _uow.SaveChangesAsync();
+
+        return costAdded;
     }
 
     public async Task<CostModel?> GetByIdOrDefault(Guid id)
@@ -59,7 +63,11 @@ public class CostService : ICostService
         if ((await _costRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _costRepository.RemoveByIdOrDefault(id);
+        var costRemoved = await _costRepository.RemoveByIdOrDefault(id);
+
+        await _uow.SaveChangesAsync();
+
+        return costRemoved;
     }
 
     public async Task<CostModel?> UpdateByIdOrDefault(Guid id, CostModel model)
@@ -72,6 +80,10 @@ public class CostService : ICostService
         if ((await _costRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _costRepository.UpdateByIdOrDefault(id, Mappings.Mapper.Map(model));
+        var costUpdated = await _costRepository.UpdateByIdOrDefault(id, Mappings.Mapper.Map(model));
+
+        await _uow.SaveChangesAsync();
+
+        return costUpdated;
     }
 }

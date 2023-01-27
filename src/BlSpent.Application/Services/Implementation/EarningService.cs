@@ -28,7 +28,11 @@ public class EarningService : IEarningService
         if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
             throw new PageNotFoundCoreException(model.PageId);
 
-        return await _earningRepository.Add(Mappings.Mapper.Map(model));
+        var earnAdded = await _earningRepository.Add(Mappings.Mapper.Map(model));
+
+        await _uow.SaveChangesAsync();
+
+        return earnAdded;
     }
 
     public async Task<EarningModel?> GetByIdOrDefault(Guid id)
@@ -59,7 +63,11 @@ public class EarningService : IEarningService
         if ((await _earningRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _earningRepository.RemoveByIdOrDefault(id);
+        var earnRemoved = await _earningRepository.RemoveByIdOrDefault(id);
+
+        await _uow.SaveChangesAsync();
+
+        return earnRemoved;
     }
 
     public async Task<EarningModel?> UpdateByIdOrDefault(Guid id, EarningModel model)
@@ -72,6 +80,10 @@ public class EarningService : IEarningService
         if ((await _earningRepository.GetByIdOrDefault(id)) is null)
             return null;
 
-        return await _earningRepository.UpdateByIdOrDefault(id, Mappings.Mapper.Map(model));
+        var earnUpdated = await _earningRepository.UpdateByIdOrDefault(id, Mappings.Mapper.Map(model));
+
+        await _uow.SaveChangesAsync();
+
+        return earnUpdated;
     }
 }
