@@ -4,17 +4,21 @@ using BlSpent.Application.Services.Interfaces;
 using BlSpent.Application.UoW;
 using BlSpent.Application.Repository;
 using BlSpent.Application.Exceptions;
+using BlSpent.Application.Security;
 
 namespace BlSpent.Application.Services.Implementation;
 
-public class EarningService : IEarningService
+public class EarningService : BaseService, IEarningService
 {
     private readonly IUnitOfWork _uow;
     private readonly IEarningRepository _earningRepository;
     private readonly IPageRepository _pageRepository;
 
     public EarningService(IUnitOfWork uow, 
-        IEarningRepository earningRepository, IPageRepository pageRepository)
+        IEarningRepository earningRepository, 
+        IPageRepository pageRepository,
+        ISecurityContext securityContext)
+        : base(securityContext)
     {
         _uow = uow;
         _earningRepository = earningRepository;
@@ -23,6 +27,8 @@ public class EarningService : IEarningService
 
     public async Task<EarningModel> Add(EarningModel model)
     {
+        await _securityChecker.ThrowIfCantModify();
+
         using var transaction = await _uow.BeginTransactionAsync();
 
         if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
@@ -37,12 +43,16 @@ public class EarningService : IEarningService
 
     public async Task<EarningModel?> GetByIdOrDefault(Guid id)
     {
+        await _securityChecker.ThrowIfCantRead();
+
         using var transaction = await _uow.OpenConnectionAsync();
         return await _earningRepository.GetByIdOrDefault(id);
     }
 
     public async IAsyncEnumerable<EarningModel> GetByPageId(Guid pageId)
     {
+        await _securityChecker.ThrowIfCantRead();
+
         if (Guid.Empty == pageId)
             yield break;
 
@@ -55,6 +65,8 @@ public class EarningService : IEarningService
 
     public async Task<EarningModel?> RemoveByIdOrDefault(Guid id)
     {
+        await _securityChecker.ThrowIfCantModify();
+        
         if (Guid.Empty == id)
             return null;
 
@@ -72,7 +84,9 @@ public class EarningService : IEarningService
 
     public async Task<EarningModel?> UpdateByIdOrDefault(Guid id, EarningModel model)
     {
-         if (Guid.Empty == id)
+        await _securityChecker.ThrowIfCantModify();
+
+        if (Guid.Empty == id)
             return null;
 
         using var transaction = await _uow.BeginTransactionAsync();

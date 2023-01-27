@@ -1,20 +1,22 @@
 using BlSpent.Application.Model;
-using BlSpent.Core.Entities;
 using BlSpent.Application.Services.Interfaces;
 using BlSpent.Application.UoW;
 using BlSpent.Application.Repository;
 using BlSpent.Application.Exceptions;
+using BlSpent.Application.Security;
 
 namespace BlSpent.Application.Services.Implementation;
 
-public class CostService : ICostService
+public class CostService : BaseService, ICostService
 {
     private readonly IUnitOfWork _uow;
     private readonly ICostRepository _costRepository;
     private readonly IPageRepository _pageRepository;
 
     public CostService(IUnitOfWork uow, 
-        ICostRepository costRepository, IPageRepository pageRepository)
+        ICostRepository costRepository, IPageRepository pageRepository,
+        ISecurityContext securityContext)
+        : base(securityContext)
     {
         _uow = uow;
         _costRepository = costRepository;
@@ -23,6 +25,8 @@ public class CostService : ICostService
 
     public async Task<CostModel> Add(CostModel model)
     {
+        await _securityChecker.ThrowIfCantModify();
+
         using var transaction = await _uow.BeginTransactionAsync();
 
         if ((await _pageRepository.GetByIdOrDefault(model.PageId)) is null)
@@ -37,12 +41,16 @@ public class CostService : ICostService
 
     public async Task<CostModel?> GetByIdOrDefault(Guid id)
     {
+        await _securityChecker.ThrowIfCantRead();
+
         using var transaction = await _uow.OpenConnectionAsync();
         return await _costRepository.GetByIdOrDefault(id);
     }
 
     public async IAsyncEnumerable<CostModel> GetByPageId(Guid pageId)
     {
+        await _securityChecker.ThrowIfCantRead();
+
         if (Guid.Empty == pageId)
             yield break;
 
@@ -55,6 +63,8 @@ public class CostService : ICostService
 
     public async Task<CostModel?> RemoveByIdOrDefault(Guid id)
     {
+        await _securityChecker.ThrowIfCantModify();
+
         if (Guid.Empty == id)
             return null;
 
@@ -72,6 +82,8 @@ public class CostService : ICostService
 
     public async Task<CostModel?> UpdateByIdOrDefault(Guid id, CostModel model)
     {
+        await _securityChecker.ThrowIfCantModify();
+
          if (Guid.Empty == id)
             return null;
 
