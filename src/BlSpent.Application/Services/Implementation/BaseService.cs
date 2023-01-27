@@ -5,7 +5,7 @@ namespace BlSpent.Application.Services.Implementation;
 
 public abstract class BaseService
 {
-    private readonly ISecurityContext _securityContext;
+    protected readonly ISecurityContext _securityContext;
     internal readonly ClaimModelChecker _securityChecker;
     public BaseService(ISecurityContext securityContext)
     {
