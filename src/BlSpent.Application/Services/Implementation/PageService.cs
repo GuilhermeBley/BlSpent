@@ -25,7 +25,7 @@ public class PageService : BaseService, IPageService
 
     public async Task<PageModel?> Add(PageModel pageModel)
     {
-        await _securityChecker.ThrowIfIsntAuthorizedInPage();
+        await _securityChecker.ThrowIfIsntLogged();
 
         var currentUserId = (await _securityContext.GetCurrentClaim())?.UserId
             ?? throw new Core.Exceptions.UnauthorizedCoreException();
@@ -52,7 +52,7 @@ public class PageService : BaseService, IPageService
 
     public async Task<PageModel?> GetByIdOrDefault(Guid id)
     {
-        await _securityChecker.ThrowIfCantRead();
+        await _securityChecker.ThrowIfIsntLogged();
 
         using var connection = await _uoW.OpenConnectionAsync();
 
@@ -61,7 +61,7 @@ public class PageService : BaseService, IPageService
 
     public async IAsyncEnumerable<PageModel> GetByUser(Guid userId)
     {
-        await _securityChecker.ThrowIfCantRead();
+        await _securityChecker.ThrowIfIsntLogged();
 
         using var connection = await _uoW.OpenConnectionAsync();
 
