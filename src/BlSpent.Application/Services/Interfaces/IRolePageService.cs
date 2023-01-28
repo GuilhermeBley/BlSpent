@@ -4,10 +4,10 @@ namespace BlSpent.Application.Services.Interfaces;
 
 public interface IRolePageService
 {
-    IAsyncEnumerable<RolePageModel> GetByPage(Guid pageId);
+    IAsyncEnumerable<RolePageModel> GetByPage(Guid rolePageId);
     Task<RolePageModel?> AddOrUpdateRoleReadOnly(RolePageModel pageModel);
     Task<RolePageModel?> AddOrUpdateRoleModifier(RolePageModel pageModel);
-    Task<RolePageModel?> UpdateByIdOrDefault(Guid pageId, RolePageModel pageModel);
-    Task<RolePageModel?> RemoveByIdOrDefault(Guid pageId);
+    Task<RolePageModel?> UpdateByIdOrDefault(Guid rolePageId, RolePageModel pageModel);
+    Task<RolePageModel?> RemoveByIdOrDefault(Guid rolePageId);
     Task<RolePageModel?> GetByIdOrDefault(Guid id);
 }
