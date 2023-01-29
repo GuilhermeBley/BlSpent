@@ -8,7 +8,7 @@ public interface IRolePageService
     /// Owners can view who is activated in your page
     /// </summary>
     /// <param name="pageId">page id</param>
-    IAsyncEnumerable<RolePageModel> GetByPage(Guid pageId);
+    IAsyncEnumerable<RoleUserPageModel> GetByPage(Guid pageId);
 
     /// <summary>
     /// Current Owner of page  update user to role 'ReadOnly'
