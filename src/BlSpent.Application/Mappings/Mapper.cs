@@ -12,6 +12,23 @@ internal static class Mapper
         return Core.Entities.Earning.Create(model.EarnDate, model.Value, model.PageId);
     }
 
+    public static Model.RolePageModel MapToRolePage (Model.RoleUserPageModel model)
+    {
+        return new Model.RolePageModel
+        {
+            CreateDate = model.CreateDate,
+            Id = model.Id,
+            PageId = model.PageId,
+            Role = model.Role,
+            UserId = model.UserId
+        };
+    }
+
+    public static Core.Entities.RolePage Map (Model.RoleUserPageModel model)
+    {
+        return Core.Entities.RolePage.Create(model.UserId, model.PageId, model.Role);
+    }
+
     public static Core.Entities.Goal Map (Model.GoalModel model)
     {
         return Core.Entities.Goal.Create(model.TargetDate, model.Value, model.PageId);

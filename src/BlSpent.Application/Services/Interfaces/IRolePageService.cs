@@ -8,6 +8,12 @@ public interface IRolePageService
     /// Owners can view who is activated in your page
     /// </summary>
     /// <param name="pageId">page id</param>
+    IAsyncEnumerable<RoleUserPageModel> CurrentOwnerGetByPage(Guid pageId);
+
+    /// <summary>
+    /// Owners can view who is activated in your page
+    /// </summary>
+    /// <param name="pageId">page id</param>
     IAsyncEnumerable<RoleUserPageModel> GetByPage(Guid pageId);
 
     /// <summary>
@@ -53,7 +59,7 @@ public interface IRolePageService
     Task<RolePageModel> RemoveByIdOrDefault(Guid rolePageId);
 
     /// <summary>
-    /// Get role page with access by id
+    /// Get role page with Current User access, by id
     /// </summary>
     /// <param name="id"></param>
     /// <returns>Role page or null if not found.</returns>

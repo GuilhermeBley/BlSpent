@@ -25,41 +25,166 @@ public class RolePageService : BaseService, IRolePageService
 
     public async Task<RolePageModel?> CurrentOwnerRemove(Guid rolePageId)
     {
+        await _securityChecker.ThrowIfIsntOwner();
+
+        using var transaction = _uoW.BeginTransactionAsync();
+
+        var tuple = await GetCurrentInfo();
+
+        var rolePage = await _rolePageRepository.GetByPageAndUserOrDefault(tuple.userId, tuple.pageId);
+
+        if (rolePage is null ||
+            rolePage.Id != rolePageId)
+            throw new Core.Exceptions.NotFoundCoreException("role not found.");
+
+        var rolePageRemoved = await _rolePageRepository.RemoveByIdOrDefault(rolePageId);
+
+        await _uoW.SaveChangesAsync();
+
+        return rolePageRemoved;
+    }
+
+    public async Task<RolePageModel> CurrentOwnerUpdateRoleModifier(RolePageModel rolePageModel)
+    {
+        await _securityChecker.ThrowIfIsntOwner();
+
+        using var transaction = _uoW.BeginTransactionAsync();
+
+        var tuple = await GetCurrentInfo();
+
+        if (rolePageModel.PageId != tuple.pageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
+
+        var roleToUpdate = await _rolePageRepository.GetByPage(tuple.pageId)
+            .FirstOrDefaultAsync(role => role.Id == rolePageModel.Id);
+
+        if (roleToUpdate is null)
+            throw new Core.Exceptions.NotFoundCoreException("Role not found.");
+        
+        if (roleToUpdate.Role.Equals(Core.Security.PageClaim.Modifier.Value))
+            return Mappings.Mapper.MapToRolePage(roleToUpdate);
+
+        roleToUpdate.Role = Core.Security.PageClaim.Modifier.Value;
+
+        var rolePageUpdated =
+            await _rolePageRepository.UpdateByIdOrDefault(
+                rolePageModel.Id, Mappings.Mapper.Map(roleToUpdate));
+
+        if (rolePageUpdated is null)
+            throw new Core.Exceptions.GenericCoreException($"Failed to update role '{roleToUpdate.Id}'");
+
+        await _uoW.SaveChangesAsync();
+
+        return rolePageUpdated;
+    }
+
+    public async Task<RolePageModel> CurrentOwnerUpdateRoleReadOnly(RolePageModel rolePageModel)
+    {
+        await _securityChecker.ThrowIfIsntOwner();
+
+        using var transaction = _uoW.BeginTransactionAsync();
+
+        var tuple = await GetCurrentInfo();
+
+        if (rolePageModel.PageId != tuple.pageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
+
+        var roleToUpdate = await _rolePageRepository.GetByPage(tuple.pageId)
+            .FirstOrDefaultAsync(role => role.Id == rolePageModel.Id);
+
+        if (roleToUpdate is null)
+            throw new Core.Exceptions.NotFoundCoreException("Role not found.");
+        
+        if (roleToUpdate.Role.Equals(Core.Security.PageClaim.ReadOnly.Value))
+            return Mappings.Mapper.MapToRolePage(roleToUpdate);
+
+        roleToUpdate.Role = Core.Security.PageClaim.ReadOnly.Value;
+
+        var rolePageUpdated =
+            await _rolePageRepository.UpdateByIdOrDefault(
+                rolePageModel.Id, Mappings.Mapper.Map(roleToUpdate));
+
+        if (rolePageUpdated is null)
+            throw new Core.Exceptions.GenericCoreException($"Failed to update role '{roleToUpdate.Id}'");
+
+        await _uoW.SaveChangesAsync();
+
+        return rolePageUpdated;
+    }
+
+    public async Task<RoleUserPageModel?> GetByIdOrDefault(Guid id)
+    {
+        await _securityChecker.ThrowIfIsntAuthorizedInPage();
+        
+        using var transaction = _uoW.BeginTransactionAsync();
+
+        var tuple = await GetCurrentInfo();
+
+        var rolePageFound = 
+            await _rolePageRepository.GetByPageAndUserOrDefault(tuple.userId, id);
+
+        return rolePageFound;
+    }
+
+    public async IAsyncEnumerable<RoleUserPageModel> CurrentOwnerGetByPage(Guid pageId)
+    {
+        await _securityChecker.ThrowIfIsntOwner();
+        
+        var tuple = await GetCurrentInfo();
+
+        if (pageId != tuple.pageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
+
+        await foreach(var roleUserPageModel in _rolePageRepository.GetByPage(pageId))
+            yield return roleUserPageModel;
+    }
+
+    public async IAsyncEnumerable<RoleUserPageModel> GetByPage(Guid pageId)
+    {
+        await _securityChecker.ThrowIfIsntAuthorizedInPage();
+        
+        var tuple = await GetCurrentInfo();
+
+        if (pageId != tuple.pageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
+
+        await foreach(var roleUserPageModel in _rolePageRepository.GetByPage(pageId))
+            yield return roleUserPageModel;
+    }
+
+    public async Task<RolePageModel> InviteRoleModifier(RolePageModel pageModel)
+    {
+        await _securityChecker.ThrowIfIsntInvitation();
+        
+        var tuple = await GetCurrentInfo();
+
+        if (!pageModel.Role.Equals(Core.Security.PageClaim.Modifier.Value))
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid role.");
+        pageModel.UserId = tuple.userId;
+        pageModel.PageId = tuple.pageId;
+    }
+
+    public async Task<RolePageModel> InviteRoleReadOnly(RolePageModel rolePageModel)
+    {
+        await _securityChecker.ThrowIfIsntInvitation();
         throw new NotImplementedException();
     }
 
-    public Task<RolePageModel> CurrentOwnerUpdateRoleModifier(RolePageModel rolePageModel)
+    public async Task<RolePageModel> RemoveByIdOrDefault(Guid rolePageId)
     {
+        await _securityChecker.ThrowIfIsntAuthorizedInPage();
         throw new NotImplementedException();
     }
 
-    public Task<RolePageModel> CurrentOwnerUpdateRoleReadOnly(RolePageModel rolePageModel)
+    private async Task<(Guid userId, Guid pageId)> GetCurrentInfo()
     {
-        throw new NotImplementedException();
-    }
+        var claimModel = (await _securityContext.GetCurrentClaim()) ??
+             throw new Core.Exceptions.ForbiddenCoreException();
 
-    public Task<RolePageModel?> GetByIdOrDefault(Guid id)
-    {
-        throw new NotImplementedException();
-    }
+        if (claimModel.UserId is null ||
+            claimModel.PageId is null)
+            throw new Core.Exceptions.ForbiddenCoreException();
 
-    public IAsyncEnumerable<RolePageModel> GetByPage(Guid pageId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<RolePageModel> InviteRoleModifier(RolePageModel pageModel)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<RolePageModel> InviteRoleReadOnly(RolePageModel rolePageModel)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<RolePageModel> RemoveByIdOrDefault(Guid rolePageId)
-    {
-        throw new NotImplementedException();
+        return (claimModel.UserId.Value, claimModel.PageId.Value);
     }
 }
