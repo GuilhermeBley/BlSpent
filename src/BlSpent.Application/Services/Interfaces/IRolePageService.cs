@@ -57,5 +57,5 @@ public interface IRolePageService
     /// </summary>
     /// <param name="id"></param>
     /// <returns>Role page or null if not found.</returns>
-    Task<RolePageModel?> GetByIdOrDefault(Guid id);
+    Task<RoleUserPageModel?> GetByIdOrDefault(Guid id);
 }
