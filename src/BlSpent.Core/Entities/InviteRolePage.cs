@@ -90,9 +90,9 @@ public class InviteRolePage : Entity
         if (pageId.Equals(Guid.Empty))
             throw new GenericCoreException("Invalid idPage. Guid Empty.");
 
-        if (!Security.PageClaim.AvailableRoles.Where(claim => !claim.Equals(Security.PageClaim.Owner))
+        if (!Security.PageClaim.AvailableRoles.Where(claim => !claim.Equals(Security.PageClaim.Owner.Value))
             .Contains(role))
-            throw new GenericCoreException($"Role {role} isn't registred. Try {string.Join(',', Security.PageClaim.AvailableRoles)}.");
+            throw new GenericCoreException($"Role {role} isn't allowed. Try {string.Join(',', Security.PageClaim.AvailableRoles.Where(claim => !claim.Equals(Security.PageClaim.Owner.Value)))}.");
 
         return new InviteRolePage(Guid.NewGuid(), email, invitationOwner, pageId, role, DateTime.Now);
     }
