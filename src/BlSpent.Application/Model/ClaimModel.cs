@@ -40,6 +40,11 @@ public class ClaimModel
     /// </summary>
     public DateTime? Expires { get; } = null;
 
+    /// <summary>
+    /// Check if is a invite to page
+    /// </summary>
+    public bool IsInvite { get; }
+
     private ClaimModel() { }
 
     public ClaimModel(Guid? userId, string? name, string? lastName, Guid? pageId, string? accessType, DateTime? expires)

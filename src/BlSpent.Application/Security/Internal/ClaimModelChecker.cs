@@ -62,7 +62,13 @@ internal class ClaimModelChecker
     public async Task ThrowIfIsntOwner()
     {
         if (!IsOwner(await _securityContext.GetCurrentClaim()))
-            throw new ForbiddenCoreException("Only owners can access this resource.");;
+            throw new ForbiddenCoreException("Only owners can access this resource.");
+    }
+
+    public async Task ThrowIfIsntInvitation()
+    {
+        if (!IsInvite(await _securityContext.GetCurrentClaim()))
+            throw new ForbiddenCoreException("Only invites are permitted.");
     }
 
     /// <summary>
@@ -149,6 +155,23 @@ internal class ClaimModelChecker
 
         if (claimModel.AccessType is not null &&
             claimModel.AccessType.Equals(PageClaim.Owner.Value))
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if user contains invitation
+    /// </summary>
+    /// <param name="claimModel">claim model to check</param>
+    /// <returns>true is owner, otherwise, isn't</returns>
+    private static bool IsInvite(ClaimModel? claimModel)
+    {
+        if (claimModel is null ||
+            !IsAuthorizedInPage(claimModel))
+            return false;
+
+        if (claimModel.IsInvite)
             return true;
 
         return false;
