@@ -42,9 +42,9 @@ public class RolePageService : BaseService, IRolePageService
         return await _rolePageRepository.GetByIdOrDefault(id);
     }
 
-    public async IAsyncEnumerable<RolePageModel> GetByPage(Guid rolePageId)
+    public async IAsyncEnumerable<RolePageModel> GetByPage(Guid pageId)
     {
-        await _securityChecker.ThrowIfIsntLogged();
+        await _securityChecker.ThrowIfIsntOwner();
         using var connection = await _uoW.OpenConnectionAsync();
         await foreach (var rolePageModel in _rolePageRepository.GetByPage(rolePageId))
             yield return rolePageModel;
@@ -52,7 +52,7 @@ public class RolePageService : BaseService, IRolePageService
 
     public async Task<RolePageModel?> RemoveByIdOrDefault(Guid rolePageId)
     {
-        await _securityChecker.ThrowIfIsntLogged();
+        await _securityChecker.ThrowIfIsntAuthorizedInPage();
 
         var userId = (await _securityContext.GetCurrentClaim())?.UserId
             ?? throw new Core.Exceptions.UnauthorizedCoreException();
@@ -75,6 +75,8 @@ public class RolePageService : BaseService, IRolePageService
 
     private async Task<RolePageModel?> CreateOrUpdate(RolePageModel rolePageModel)
     {
+        await _securityChecker.ThrowIfIsntLogged();
+
         var rolePage = Mappings.Mapper.Map(rolePageModel);
 
         using var transaction = await _uoW.BeginTransactionAsync();
