@@ -248,8 +248,9 @@ public class User : Entity
             || accessFailedCount < MIN_COUNT_ACCESS_FAILED)
             throw new GenericCoreException($"{nameof(accessFailedCount)} must be in range between '{MIN_COUNT_ACCESS_FAILED}' to '{MAX_COUNT_ACCESS_FAILED}'.");
         
-        if (string.IsNullOrWhiteSpace(email))
-            throw new GenericCoreException($"{nameof(email)} is null or empty.");
+        if (string.IsNullOrWhiteSpace(email) ||
+            !Internal.Validation.IsValidEmail(email))
+            throw new GenericCoreException($"{nameof(email)} is empty or invalid.");
 
         if (string.IsNullOrWhiteSpace(name))
             throw new GenericCoreException($"{nameof(name)} is null or empty.");
