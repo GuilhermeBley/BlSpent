@@ -8,4 +8,5 @@ public interface IRolePageRepository : IBaseRepository<RolePageModel, RolePage, 
     IAsyncEnumerable<RolePageModel> GetByUserOrDefault(Guid userId);
     IAsyncEnumerable<RolePageModel> GetByPage(Guid pageId);
     Task<RolePageModel?> CreateOrUpdate(Guid id, RolePageModel rolePageModel);
+    Task<RolePageModel?> GetByPageAndUserOrDefault(Guid userId, Guid pageId);
 }
