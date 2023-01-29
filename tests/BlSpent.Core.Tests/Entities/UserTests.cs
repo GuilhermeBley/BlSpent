@@ -142,4 +142,23 @@ public class UserTests
 
         Assert.True(user1.Equals(user1));
     }
+
+    [Fact]  
+    public void Create_CheckEmail_Failed()
+    {
+        Assert.Throws<GenericCoreException>(() => User.Create(
+            email: "InvalidEmial",
+            emailConfirmed: false,
+            phoneNumber: null,
+            phoneNumberConfirmed: false,
+            twoFactoryEnabled: true,
+            lockOutEnd: null,
+            lockOutEnabled: false,
+            accessFailedCount: 0,
+            name: "user1",
+            lastName: "teste1 teste2",
+            password: "user1@123",
+            string.Empty,
+            string.Empty));
+    }
 }

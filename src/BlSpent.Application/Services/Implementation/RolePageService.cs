@@ -162,6 +162,8 @@ public class RolePageService : BaseService, IRolePageService
             throw new Core.Exceptions.ForbiddenCoreException("Invalid role.");
         pageModel.UserId = tuple.userId;
         pageModel.PageId = tuple.pageId;
+
+        throw new NotImplementedException();
     }
 
     public async Task<RolePageModel> InviteRoleReadOnly(RolePageModel rolePageModel)
