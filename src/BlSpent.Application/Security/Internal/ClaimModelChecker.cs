@@ -71,6 +71,16 @@ internal class ClaimModelChecker
             throw new ForbiddenCoreException("Only invites are permitted.");
     }
 
+    private static bool IsExpired(ClaimModel? claimModel)
+    {
+        if (claimModel is null ||
+            claimModel.Expires is null ||
+            claimModel.Expires < DateTime.Now)
+            return true;
+
+        return false;
+    }
+
     /// <summary>
     /// Checks if is logged
     /// </summary>
@@ -78,6 +88,9 @@ internal class ClaimModelChecker
     /// <returns>true is logged, otherwise, isn't</returns>
     private static bool IsLogged(ClaimModel? claimModel)
     {
+        if (IsExpired(claimModel))
+            return false;
+            
         if (claimModel is null ||
             claimModel.Equals(ClaimModel.Default) ||
             claimModel.UserId is null)

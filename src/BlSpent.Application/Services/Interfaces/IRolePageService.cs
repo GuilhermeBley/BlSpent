@@ -33,16 +33,16 @@ public interface IRolePageService
     /// <summary>
     /// User logged accept 'ReadOnly' role in page
     /// </summary>
-    /// <param name="rolePageModel">role page model</param>
+    /// <param name="invitePageModel">role page model</param>
     /// <returns>role page added</returns>
-    Task<RolePageModel> InviteRoleReadOnly(RolePageModel rolePageModel);
+    Task<RolePageModel> InviteRoleReadOnly(InviteRolePageModel invitePageModel);
 
     /// <summary>
     /// User logged accept 'Modifier' role in page
     /// </summary>
-    /// <param name="rolePageModel">role page model</param>
+    /// <param name="invitePageModel">invite role page model</param>
     /// <returns>role page added</returns>
-    Task<RolePageModel> InviteRoleModifier(RolePageModel pageModel);
+    Task<RolePageModel> InviteRoleModifier(InviteRolePageModel invitePageModel);
 
     /// <summary>
     /// Current owner of page remove role of user

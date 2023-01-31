@@ -161,21 +161,19 @@ public class RolePageService : BaseService, IRolePageService
             yield return roleUserPageModel;
     }
 
-    public async Task<RolePageModel> InviteRoleModifier(RolePageModel pageModel)
+    public async Task<RolePageModel> InviteRoleModifier(InviteRolePageModel invitePageModel)
     {
         await _securityChecker.ThrowIfIsntInvitation();
+
+        if (!invitePageModel.Role.Equals(Core.Security.PageClaim.Modifier.Value))
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid role.");
         
         var tuple = await GetCurrentInfo();
-
-        if (!pageModel.Role.Equals(Core.Security.PageClaim.Modifier.Value))
-            throw new Core.Exceptions.ForbiddenCoreException("Invalid role.");
-        pageModel.UserId = tuple.userId;
-        pageModel.PageId = tuple.pageId;
 
         throw new NotImplementedException();
     }
 
-    public async Task<RolePageModel> InviteRoleReadOnly(RolePageModel rolePageModel)
+    public async Task<RolePageModel> InviteRoleReadOnly(InviteRolePageModel invitePageModel)
     {
         await _securityChecker.ThrowIfIsntInvitation();
         throw new NotImplementedException();
