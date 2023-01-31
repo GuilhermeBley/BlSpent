@@ -37,6 +37,9 @@ public class RolePageService : BaseService, IRolePageService
             rolePage.Id != rolePageId)
             throw new Core.Exceptions.NotFoundCoreException("role not found.");
 
+        if (rolePage.UserId == tuple.userId)
+            throw new Core.Exceptions.ForbiddenCoreException("Owners can't delete their own roles.");
+
         var rolePageRemoved = await _rolePageRepository.RemoveByIdOrDefault(rolePageId);
 
         await _uoW.SaveChangesAsync();
@@ -51,6 +54,9 @@ public class RolePageService : BaseService, IRolePageService
         using var transaction = _uoW.BeginTransactionAsync();
 
         var tuple = await GetCurrentInfo();
+
+        if (rolePageModel.UserId == tuple.userId)
+            throw new Core.Exceptions.ForbiddenCoreException("Owners can't update their own roles.");
 
         if (rolePageModel.PageId != tuple.pageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
@@ -85,6 +91,9 @@ public class RolePageService : BaseService, IRolePageService
         using var transaction = _uoW.BeginTransactionAsync();
 
         var tuple = await GetCurrentInfo();
+
+        if (rolePageModel.UserId == tuple.userId)
+            throw new Core.Exceptions.ForbiddenCoreException("Owners can't update their own roles.");
 
         if (rolePageModel.PageId != tuple.pageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
