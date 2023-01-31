@@ -41,9 +41,6 @@ public class InviteRolePage : Entity
         Role = role;
         CreateDate = createDate;
     }
-
-    
-
     
     public override bool Equals(object? obj)
     {
@@ -68,7 +65,7 @@ public class InviteRolePage : Entity
         return base.GetHashCode() * 459864869;
     }
 
-        /// <summary>
+    /// <summary>
     /// Creates a new <see cref="RolePage"/>
     /// </summary>
     /// <param name="email"><inheritdoc cref="Email" path="/summary"/></param>
