@@ -4,9 +4,9 @@ namespace BlSpent.Application.Services.Interfaces;
 
 public interface IPageService
 {
+    Task<PageModel?> Create(PageModel pageModel);
+    Task<PageModel?> CurrentPageGetByIdOrDefault(Guid id);
+    Task<PageModel> CurrentPageUpdate(Guid pageId, PageModel pageModel);
+    Task<PageModel> CurrentPageRemove(Guid pageId);
     IAsyncEnumerable<PageModel> GetByUser(Guid userId);
-    Task<PageModel?> Add(PageModel pageModel);
-    Task<PageModel?> UpdateByIdOrDefault(Guid pageId, PageModel pageModel);
-    Task<PageModel?> RemoveByIdOrDefault(Guid pageId);
-    Task<PageModel?> GetByIdOrDefault(Guid id);
 }

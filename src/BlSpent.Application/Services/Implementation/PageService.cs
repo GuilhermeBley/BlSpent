@@ -23,40 +23,88 @@ public class PageService : BaseService, IPageService
         _uoW = uoW;
     }
 
-    public async Task<PageModel?> Add(PageModel pageModel)
+    public async Task<PageModel?> Create(PageModel pageModel)
     {
         await _securityChecker.ThrowIfIsntLogged();
 
-        var currentUserId = (await _securityContext.GetCurrentClaim())?.UserId
-            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+        var currentUserId = await GetCurrentUser();
 
         using var transaction = await _uoW.BeginTransactionAsync();
 
         var pageAdded = await _pageRepository.Add(Mappings.Mapper.Map(pageModel));
 
-        var rolePageModel = new RolePageModel()
-        {
-            Id = Guid.NewGuid(),
-            CreateDate = DateTime.Now,
-            PageId = pageAdded.Id,
-            Role = Core.Security.PageClaim.Owner.Value,
-            UserId = currentUserId
-        };
-
-        var rolePage = await _rolePageRepository.Add(Mappings.Mapper.Map(rolePageModel));
+        var rolePageAdded = 
+            await _rolePageRepository.Add(Core.Entities.RolePage.CreateOwnerRolePage(currentUserId, pageAdded.Id));
 
         await _uoW.SaveChangesAsync();
 
         return pageAdded;
     }
 
-    public async Task<PageModel?> GetByIdOrDefault(Guid id)
+    public async Task<PageModel?> CurrentPageGetByIdOrDefault(Guid id)
     {
         await _securityChecker.ThrowIfIsntLogged();
 
         using var connection = await _uoW.OpenConnectionAsync();
 
+        var tupleCurrUserAndPage = await GetCurrentUserAndPage();
+
+        if (tupleCurrUserAndPage.PageId != id)
+            throw new Core.Exceptions.ForbiddenCoreException("Cannot access this page.");
+
         return await _pageRepository.GetByIdOrDefault(id);
+    }
+
+    public async Task<PageModel> CurrentPageUpdate(Guid pageId, PageModel pageModel)
+    {
+        await _securityChecker.ThrowIfIsntOwner();
+
+        using var transaction = await _uoW.BeginTransactionAsync();
+
+        var currentUserAndPage = await GetCurrentUserAndPage();
+
+        if (pageId != currentUserAndPage.PageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Cannot update this page.");
+
+        var pageUpdated = await _pageRepository.UpdateByIdOrDefault(pageId, 
+            Mappings.Mapper.Map(pageModel));
+        
+        if (pageUpdated is null)
+            throw new Core.Exceptions.NotFoundCoreException("Page not found.");
+
+        await _uoW.SaveChangesAsync();
+
+        return pageUpdated;
+    }
+    
+    public async Task<PageModel> CurrentPageRemove(Guid pageId)
+    {
+        await _securityChecker.ThrowIfIsntOwner();
+
+        using var transaction = await _uoW.BeginTransactionAsync();
+
+        var currentUserAndPage = await GetCurrentUserAndPage();
+
+        if (currentUserAndPage.PageId != pageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Cannot remove this page.");
+
+        var pageRemoved = await _pageRepository.GetByIdOrDefault(pageId);
+
+        if (pageRemoved is null)
+            throw new Core.Exceptions.NotFoundCoreException("Page not found.");
+
+        var rolePages = await _rolePageRepository.GetByPage(pageId)
+            .ToListAsync();
+
+        foreach (var rolePage in rolePages)
+        {
+            var roleRemoved = await _rolePageRepository.RemoveByIdOrDefault(rolePage.Id)
+                ?? throw new Core.Exceptions.NotFoundCoreException("Role cannot be removed.");
+        }
+
+        await _uoW.SaveChangesAsync();
+
+        return pageRemoved;
     }
 
     public async IAsyncEnumerable<PageModel> GetByUser(Guid userId)
@@ -65,54 +113,32 @@ public class PageService : BaseService, IPageService
 
         using var connection = await _uoW.OpenConnectionAsync();
 
+        var currentUserId = await GetCurrentUser();
+
+        if (currentUserId != userId)
+            throw new Core.Exceptions.UnauthorizedCoreException();
+
         await foreach (var page in _pageRepository.GetPagesWhichUserCanAccess(userId))
             yield return page;
     }
 
-    public async Task<PageModel?> RemoveByIdOrDefault(Guid pageId)
+    private async Task<Guid> GetCurrentUser()
     {
-        await _securityChecker.ThrowIfIsntOwner();
-
-        await _securityChecker.ThrowIfIsntAuthorizedInPage();
-
-        var currentUserId = (await _securityContext.GetCurrentClaim())?.UserId
+        return (await _securityContext.GetCurrentClaim())?.UserId
             ?? throw new Core.Exceptions.UnauthorizedCoreException();
-
-        using var transaction = await _uoW.BeginTransactionAsync();
-
-        var pageRemoved = await _pageRepository.GetByIdOrDefault(pageId);
-
-        if (pageRemoved is null)
-            return null;
-
-        var rolePages = await _rolePageRepository.GetByPage(pageId)
-            .ToListAsync();
-
-        foreach (var rolePage in rolePages)
-            await _rolePageRepository.RemoveByIdOrDefault(rolePage.Id);
-
-        await _uoW.SaveChangesAsync();
-
-        return pageRemoved;
     }
 
-    public async Task<PageModel?> UpdateByIdOrDefault(Guid pageId, PageModel pageModel)
+    private async Task<(Guid UserId, Guid PageId)> GetCurrentUserAndPage()
     {
-        await _securityChecker.ThrowIfIsntOwner();
-
-        var currentUserId = (await _securityContext.GetCurrentClaim())?.UserId
+        var currentUser = await _securityContext.GetCurrentClaim()
             ?? throw new Core.Exceptions.UnauthorizedCoreException();
 
-        using var transaction = await _uoW.BeginTransactionAsync();
+        if (currentUser.UserId is null)
+            throw new Core.Exceptions.UnauthorizedCoreException();
 
-        var pageUpdated = await _pageRepository.UpdateByIdOrDefault(pageId, 
-            Mappings.Mapper.Map(pageModel));
-        
-        if (pageUpdated is null)
-            return null;
+        if (currentUser.PageId is null)
+            throw new Core.Exceptions.ForbiddenCoreException("Null or empty current page.");
 
-        await _uoW.SaveChangesAsync();
-
-        return pageUpdated;
-    }
+        return (currentUser.UserId.Value, currentUser.PageId.Value);
+    }    
 }
