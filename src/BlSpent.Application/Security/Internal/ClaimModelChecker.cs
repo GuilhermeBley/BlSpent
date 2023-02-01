@@ -124,7 +124,7 @@ internal class ClaimModelChecker
     private static bool CanRead(ClaimModel? claimModel)
     {
         if (claimModel is null ||
-            !IsAuthorizedInPage(claimModel))
+            IsInvite(claimModel))
             return false;
 
         if (claimModel.AccessType is null ||

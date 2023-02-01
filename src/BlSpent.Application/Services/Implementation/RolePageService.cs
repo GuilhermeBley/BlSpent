@@ -11,16 +11,19 @@ public class RolePageService : BaseService, IRolePageService
     private readonly IUnitOfWork _uoW;
     private readonly IRolePageRepository _rolePageRepository;
     private readonly IPageRepository _pageRepository;
+    private readonly IUserRepository _userRepository;
 
     public RolePageService(
         IUnitOfWork unitOfWork,
         IRolePageRepository rolePageRepository,
         IPageRepository pageRepository,
-        ISecurityContext securityContext) : base(securityContext)
+        ISecurityContext securityContext,
+        IUserRepository userRepository) : base(securityContext)
     {
         _uoW = unitOfWork;
         _rolePageRepository = rolePageRepository;
         _pageRepository = pageRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<RolePageModel?> CurrentOwnerRemove(Guid rolePageId)
@@ -29,15 +32,15 @@ public class RolePageService : BaseService, IRolePageService
 
         using var transaction = _uoW.BeginTransactionAsync();
 
-        var tuple = await GetCurrentInfo();
+        var tupleInfoCurrentUser = await GetCurrentInfo();
 
-        var rolePage = await _rolePageRepository.GetByPageAndUserOrDefault(tuple.userId, tuple.pageId);
+        var rolePage = await _rolePageRepository.GetByPageAndUserOrDefault(tupleInfoCurrentUser.userId, tupleInfoCurrentUser.pageId);
 
         if (rolePage is null ||
             rolePage.Id != rolePageId)
             throw new Core.Exceptions.NotFoundCoreException("role not found.");
 
-        if (rolePage.UserId == tuple.userId)
+        if (rolePage.UserId == tupleInfoCurrentUser.userId)
             throw new Core.Exceptions.ForbiddenCoreException("Owners can't delete their own roles.");
 
         var rolePageRemoved = await _rolePageRepository.RemoveByIdOrDefault(rolePageId);
@@ -53,15 +56,15 @@ public class RolePageService : BaseService, IRolePageService
 
         using var transaction = _uoW.BeginTransactionAsync();
 
-        var tuple = await GetCurrentInfo();
+        var tupleInfoCurrentUser = await GetCurrentInfo();
 
-        if (rolePageModel.UserId == tuple.userId)
+        if (rolePageModel.UserId == tupleInfoCurrentUser.userId)
             throw new Core.Exceptions.ForbiddenCoreException("Owners can't update their own roles.");
 
-        if (rolePageModel.PageId != tuple.pageId)
+        if (rolePageModel.PageId != tupleInfoCurrentUser.pageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
 
-        var roleToUpdate = await _rolePageRepository.GetByPage(tuple.pageId)
+        var roleToUpdate = await _rolePageRepository.GetByPage(tupleInfoCurrentUser.pageId)
             .FirstOrDefaultAsync(role => role.Id == rolePageModel.Id);
 
         if (roleToUpdate is null)
@@ -74,10 +77,8 @@ public class RolePageService : BaseService, IRolePageService
 
         var rolePageUpdated =
             await _rolePageRepository.UpdateByIdOrDefault(
-                rolePageModel.Id, Mappings.Mapper.Map(roleToUpdate));
-
-        if (rolePageUpdated is null)
-            throw new Core.Exceptions.GenericCoreException($"Failed to update role '{roleToUpdate.Id}'");
+                rolePageModel.Id, Mappings.Mapper.Map(roleToUpdate))
+                ?? throw new Core.Exceptions.NotFoundCoreException("Role not found to update.");
 
         await _uoW.SaveChangesAsync();
 
@@ -90,15 +91,15 @@ public class RolePageService : BaseService, IRolePageService
 
         using var transaction = _uoW.BeginTransactionAsync();
 
-        var tuple = await GetCurrentInfo();
+        var tupleInfoCurrentUser = await GetCurrentInfo();
 
-        if (rolePageModel.UserId == tuple.userId)
+        if (rolePageModel.UserId == tupleInfoCurrentUser.userId)
             throw new Core.Exceptions.ForbiddenCoreException("Owners can't update their own roles.");
 
-        if (rolePageModel.PageId != tuple.pageId)
+        if (rolePageModel.PageId != tupleInfoCurrentUser.pageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
 
-        var roleToUpdate = await _rolePageRepository.GetByPage(tuple.pageId)
+        var roleToUpdate = await _rolePageRepository.GetByPage(tupleInfoCurrentUser.pageId)
             .FirstOrDefaultAsync(role => role.Id == rolePageModel.Id);
 
         if (roleToUpdate is null)
@@ -111,10 +112,8 @@ public class RolePageService : BaseService, IRolePageService
 
         var rolePageUpdated =
             await _rolePageRepository.UpdateByIdOrDefault(
-                rolePageModel.Id, Mappings.Mapper.Map(roleToUpdate));
-
-        if (rolePageUpdated is null)
-            throw new Core.Exceptions.GenericCoreException($"Failed to update role '{roleToUpdate.Id}'");
+                rolePageModel.Id, Mappings.Mapper.Map(roleToUpdate))
+                ?? throw new Core.Exceptions.NotFoundCoreException("Role not found to update.");
 
         await _uoW.SaveChangesAsync();
 
@@ -127,10 +126,10 @@ public class RolePageService : BaseService, IRolePageService
         
         using var transaction = _uoW.BeginTransactionAsync();
 
-        var tuple = await GetCurrentInfo();
+        var tupleInfoCurrentUser = await GetCurrentInfo();
 
         var rolePageFound = 
-            await _rolePageRepository.GetByPageAndUserOrDefault(tuple.userId, id);
+            await _rolePageRepository.GetByPageAndUserOrDefault(tupleInfoCurrentUser.userId, id);
 
         return rolePageFound;
     }
@@ -139,9 +138,9 @@ public class RolePageService : BaseService, IRolePageService
     {
         await _securityChecker.ThrowIfIsntOwner();
         
-        var tuple = await GetCurrentInfo();
+        var tupleInfoCurrentUser = await GetCurrentInfo();
 
-        if (pageId != tuple.pageId)
+        if (pageId != tupleInfoCurrentUser.pageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
 
         await foreach(var roleUserPageModel in _rolePageRepository.GetByPage(pageId))
@@ -152,9 +151,9 @@ public class RolePageService : BaseService, IRolePageService
     {
         await _securityChecker.ThrowIfIsntAuthorizedInPage();
         
-        var tuple = await GetCurrentInfo();
+        var tupleInfoCurrentUser = await GetCurrentInfo();
 
-        if (pageId != tuple.pageId)
+        if (pageId != tupleInfoCurrentUser.pageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
 
         await foreach(var roleUserPageModel in _rolePageRepository.GetByPage(pageId))
@@ -167,22 +166,112 @@ public class RolePageService : BaseService, IRolePageService
 
         if (!invitePageModel.Role.Equals(Core.Security.PageClaim.Modifier.Value))
             throw new Core.Exceptions.ForbiddenCoreException("Invalid role.");
-        
-        var tuple = await GetCurrentInfo();
 
-        throw new NotImplementedException();
+        using var transaction = await _uoW.BeginTransactionAsync();
+        
+        var tupleInfoCurrentUser = await GetCurrentInfo();
+
+        if (tupleInfoCurrentUser.pageId != invitePageModel.PageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid Page.");
+
+        var user = await _userRepository.GetByIdOrDefault(tupleInfoCurrentUser.userId)
+            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+
+        if (!user.Email.Equals(invitePageModel.Email))
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid current user.");
+
+        var ownerRolePage = 
+            await _rolePageRepository.GetByPageAndUserOrDefault(invitePageModel.InvitationOwner, invitePageModel.PageId)
+            ?? throw new Core.Exceptions.NotFoundCoreException("Invitation page not found.");
+
+        if (ownerRolePage.Role != Core.Security.PageClaim.Owner.Value)
+            throw new Core.Exceptions.NotFoundCoreException("Invitation owner not found.");
+
+        var roleFoundOfUserPage =
+            await _rolePageRepository.GetByPageAndUserOrDefault(tupleInfoCurrentUser.userId, tupleInfoCurrentUser.pageId);
+
+        RolePageModel roleCreatedOrUpdated;
+        if (roleFoundOfUserPage is null)
+            roleCreatedOrUpdated = await _rolePageRepository.Add(
+                Core.Entities.RolePage.CreateModifierRolePage(tupleInfoCurrentUser.userId, invitePageModel.PageId)
+            );
+        else
+            roleCreatedOrUpdated = await _rolePageRepository.UpdateByIdOrDefault(
+                roleFoundOfUserPage.Id, Core.Entities.RolePage.CreateModifierRolePage(tupleInfoCurrentUser.userId, invitePageModel.PageId)
+            ) ?? throw new Core.Exceptions.NotFoundCoreException("Role not found.");
+
+        await transaction.SaveChangesAsync();
+
+        return roleCreatedOrUpdated;
     }
 
     public async Task<RolePageModel> InviteRoleReadOnly(InviteRolePageModel invitePageModel)
     {
         await _securityChecker.ThrowIfIsntInvitation();
-        throw new NotImplementedException();
+
+        if (!invitePageModel.Role.Equals(Core.Security.PageClaim.ReadOnly.Value))
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid role.");
+
+        using var transaction = await _uoW.BeginTransactionAsync();
+        
+        var tupleInfoCurrentUser = await GetCurrentInfo();
+
+        if (tupleInfoCurrentUser.pageId != invitePageModel.PageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid Page.");
+
+        var user = await _userRepository.GetByIdOrDefault(tupleInfoCurrentUser.userId)
+            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+
+        if (!user.Email.Equals(invitePageModel.Email))
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid current user.");
+
+        var ownerRolePage = 
+            await _rolePageRepository.GetByPageAndUserOrDefault(invitePageModel.InvitationOwner, invitePageModel.PageId)
+            ?? throw new Core.Exceptions.NotFoundCoreException("Invitation page not found.");
+
+        if (ownerRolePage.Role != Core.Security.PageClaim.Owner.Value)
+            throw new Core.Exceptions.NotFoundCoreException("Invitation owner not found.");
+
+        var roleFoundOfUserPage =
+            await _rolePageRepository.GetByPageAndUserOrDefault(tupleInfoCurrentUser.userId, tupleInfoCurrentUser.pageId);
+
+        RolePageModel roleCreatedOrUpdated;
+        if (roleFoundOfUserPage is null)
+            roleCreatedOrUpdated = await _rolePageRepository.Add(
+                Core.Entities.RolePage.CreateReadOnlyRolePage(tupleInfoCurrentUser.userId, invitePageModel.PageId)
+            );
+        else
+            roleCreatedOrUpdated = await _rolePageRepository.UpdateByIdOrDefault(
+                roleFoundOfUserPage.Id, Core.Entities.RolePage.CreateReadOnlyRolePage(tupleInfoCurrentUser.userId, invitePageModel.PageId)
+            ) ?? throw new Core.Exceptions.NotFoundCoreException("Role not found.");
+
+        await transaction.SaveChangesAsync();
+
+        return roleCreatedOrUpdated;
     }
 
     public async Task<RolePageModel> RemoveByIdOrDefault(Guid rolePageId)
     {
         await _securityChecker.ThrowIfIsntAuthorizedInPage();
-        throw new NotImplementedException();
+
+        using var transaction = await _uoW.BeginTransactionAsync();
+
+        var tupleInfoCurrentUser = await GetCurrentInfo();
+
+        var currentRoleModel =
+            await _rolePageRepository.GetByPageAndUserOrDefault(tupleInfoCurrentUser.userId, tupleInfoCurrentUser.pageId);
+
+        if (currentRoleModel is null ||
+            currentRoleModel.Id != rolePageId)
+            throw new Core.Exceptions.ForbiddenCoreException("Invalid rolePageId.");
+
+        var rolePageRemoved =
+            await _rolePageRepository.RemoveByIdOrDefault(rolePageId)
+            ?? throw new Core.Exceptions.NotFoundCoreException("Role not found to remove.");
+
+        await _uoW.SaveChangesAsync();
+
+        return rolePageRemoved;
     }
 
     private async Task<(Guid userId, Guid pageId)> GetCurrentInfo()
