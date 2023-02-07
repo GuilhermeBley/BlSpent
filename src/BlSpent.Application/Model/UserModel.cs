@@ -68,7 +68,7 @@ public class UserModel
     /// <summary>
     /// Password
     /// </summary>
-    public char[] Password { get; set; } = new char[0];
+    public string Password { get; set; } = string.Empty;
 
     /// <summary>
     /// Password
@@ -80,7 +80,11 @@ public class UserModel
     /// </summary>
     public string Salt { get; set; } = string.Empty;
     
-    public UserModel(Guid id, string email, bool emailConfirmed, string? phoneNumber, bool phoneNumberConfirmed, bool twoFactoryEnabled, DateTime? lockOutEnd, bool lockOutEnabled, int accessFailedCount, string name, string lastName, char[] password)
+    public UserModel()
+    {
+    }
+
+    public UserModel(Guid id, string email, bool emailConfirmed, string? phoneNumber, bool phoneNumberConfirmed, bool twoFactoryEnabled, DateTime? lockOutEnd, bool lockOutEnabled, int accessFailedCount, string name, string lastName, string password)
     {
         Id = id;
         Email = email;

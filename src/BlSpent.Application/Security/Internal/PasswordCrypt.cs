@@ -31,17 +31,17 @@ internal static class PasswordCrypt
     }
 
     [System.Diagnostics.DebuggerHidden]
-    public static bool VerifyPassword(string password, string hash, byte[] salt)
+    public static bool IsValidPassword(string password, string hash, byte[] salt)
     {
         var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(password, salt, ITERATIONS, hashAlgorithm, KEY_SIZE);
         return hashToCompare.SequenceEqual(Convert.FromHexString(hash));
     }
 
     [System.Diagnostics.DebuggerHidden]
-    public static bool VerifyPassword(string password, string hash, string salt)
+    public static bool IsValidPassword(string password, string hash, string salt)
     {
         var saltByte = StringToByteArray(salt);
-        return VerifyPassword(password, hash, saltByte);
+        return IsValidPassword(password, hash, saltByte);
     }
 
     [System.Diagnostics.DebuggerHidden]

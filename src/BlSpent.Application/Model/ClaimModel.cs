@@ -16,6 +16,11 @@ public class ClaimModel
     public Guid? UserId { get; } = null;
 
     /// <summary>
+    /// Unique email
+    /// </summary>
+    public string? Email { get; } = null;
+
+    /// <summary>
     /// Name
     /// </summary>
     public string? Name { get; } = null;
@@ -47,11 +52,12 @@ public class ClaimModel
 
     private ClaimModel() { }
 
-    public ClaimModel(Guid? userId, string? name, string? lastName, Guid? pageId, string? accessType, DateTime? expires)
+    public ClaimModel(Guid? userId, string? email, string? name, string? lastName, Guid? pageId, string? accessType, DateTime? expires)
     {
         UserId = userId;
         Name = name;
         LastName = lastName;
+        Email = email;
         PageId = pageId;
         AccessType = accessType;
         Expires = expires;
