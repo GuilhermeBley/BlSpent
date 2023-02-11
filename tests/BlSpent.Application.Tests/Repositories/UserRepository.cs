@@ -1,3 +1,4 @@
+using AutoMapper;
 using BlSpent.Application.Model;
 using BlSpent.Application.Repository;
 using BlSpent.Application.Tests.InMemoryDb;
@@ -7,7 +8,8 @@ namespace BlSpent.Application.Tests.Repositories;
 
 internal class UserRepository : RepositoryBase, IUserRepository
 {
-    public UserRepository(AppDbContext contex) : base(contex)
+    public UserRepository(AppDbContext contex, IMapper mapper) 
+        : base(contex, mapper)
     {
     }
 

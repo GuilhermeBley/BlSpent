@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,5 +10,6 @@ public abstract class BaseTest : Hosts.DefaultHost
     public override void ConfigureServices(HostBuilderContext context, IServiceCollection serviceCollection)
         => serviceCollection
             .AddDbContext<InMemoryDb.AppDbContext>()
-            .AddScoped<Application.UoW.IUnitOfWork, UoW.UnitOfWork>();
+            .AddScoped<Application.UoW.IUnitOfWork, UoW.UnitOfWork>()
+            .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>());
 }
