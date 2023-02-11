@@ -15,7 +15,7 @@ public class EarningModel
     /// <summary>
     /// Earn base date
     /// </summary>
-    public BaseDate EntryBaseDate => new BaseDate(EarnDate);
+    public BaseDate EntryBaseDate { get; set; }
 
     /// <summary>
     /// Value of earn
