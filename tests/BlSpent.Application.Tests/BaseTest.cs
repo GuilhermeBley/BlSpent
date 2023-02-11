@@ -8,5 +8,6 @@ public abstract class BaseTest : Hosts.DefaultHost
 {
     public override void ConfigureServices(HostBuilderContext context, IServiceCollection serviceCollection)
         => serviceCollection
-            .AddDbContext<InMemoryDb.AppDbContext>();
+            .AddDbContext<InMemoryDb.AppDbContext>()
+            .AddScoped<Application.UoW.IUnitOfWork, UoW.UnitOfWork>();
 }
