@@ -13,6 +13,9 @@ public abstract class BaseTest : Hosts.DefaultHost
             .AddScoped<Application.UoW.IUnitOfWork, UoW.UnitOfWork>()
             .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>())
             
+            .AddSingleton<Context.TestContext>()
+            .AddSingleton<Application.Security.ISecurityContext, Context.TestContext>()
+            
             .AddScoped<Application.Repository.IUserRepository, Repositories.UserRepository>()
             .AddScoped<Application.Repository.IPageRepository, Repositories.PageRepository>()
             
