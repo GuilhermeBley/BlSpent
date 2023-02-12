@@ -22,7 +22,7 @@ internal class UserRepository : RepositoryBase, IUserRepository
         await _context.Users.AddAsync(userModel);
         await _context.SaveChangesAsync();
 
-        return _mapper.Map<UserModel>(userModel);;
+        return _mapper.Map<UserModel>(userModel);
     }
 
     public async Task<IEnumerable<UserModel>> GetAll()

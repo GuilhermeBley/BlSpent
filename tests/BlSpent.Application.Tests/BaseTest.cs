@@ -11,5 +11,11 @@ public abstract class BaseTest : Hosts.DefaultHost
         => serviceCollection
             .AddDbContext<InMemoryDb.AppDbContext>()
             .AddScoped<Application.UoW.IUnitOfWork, UoW.UnitOfWork>()
-            .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>());
+            .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>())
+            
+            .AddScoped<Application.Repository.IUserRepository, Repositories.UserRepository>()
+            .AddScoped<Application.Repository.IPageRepository, Repositories.PageRepository>()
+            
+            .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
+            .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>();
 }
