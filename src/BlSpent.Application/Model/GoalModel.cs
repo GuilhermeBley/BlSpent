@@ -7,6 +7,8 @@ namespace BlSpent.Application.Model;
 /// </summary>
 public class GoalModel
 {
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Target date to goal
     /// </summary>

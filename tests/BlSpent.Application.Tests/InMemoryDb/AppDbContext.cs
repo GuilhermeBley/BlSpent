@@ -5,12 +5,12 @@ namespace BlSpent.Application.Tests.InMemoryDb;
 
 public class AppDbContext : DbContext
 {
-    public DbSet<UserModel> Users { get; set; } = null!;
-    public DbSet<PageModel> Pages { get; set; } = null!;
-    public DbSet<RolePageModel> RolesPages { get; set; } = null!;
-    public DbSet<CostModel> Costs { get; set; } = null!;
-    public DbSet<EarningModel> Earnigns { get; set; } = null!;
-    public DbSet<GoalModel> GoalModels { get; set; } = null!;
+    public DbSet<UserDbModel> Users { get; set; } = null!;
+    public DbSet<PageDbModel> Pages { get; set; } = null!;
+    public DbSet<RolePageDbModel> RolesPages { get; set; } = null!;
+    public DbSet<CostDbModel> Costs { get; set; } = null!;
+    public DbSet<EarningDbModel> Earnigns { get; set; } = null!;
+    public DbSet<GoalDbModel> GoalModels { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -21,15 +21,15 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<UserModel>()
+        modelBuilder.Entity<UserDbModel>()
             .HasIndex(p => new { p.UserName }).IsUnique();
-        modelBuilder.Entity<RolePageModel>()
+        modelBuilder.Entity<RolePageDbModel>()
             .HasIndex(p => new { p.UserId, p.PageId }).IsUnique();
-        modelBuilder.Entity<CostModel>()
+        modelBuilder.Entity<CostDbModel>()
             .Property(x => x.Value).HasPrecision(10,2);
-        modelBuilder.Entity<EarningModel>()
+        modelBuilder.Entity<EarningDbModel>()
             .Property(x => x.Value).HasPrecision(10,2);
-        modelBuilder.Entity<GoalModel>()
+        modelBuilder.Entity<GoalDbModel>()
             .Property(x => x.Value).HasPrecision(10,2);
     }
 }

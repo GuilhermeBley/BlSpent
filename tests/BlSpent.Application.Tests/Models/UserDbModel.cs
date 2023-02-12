@@ -7,12 +7,13 @@ namespace BlSpent.Application.Tests.Models;
 /// Model of <see cref="BlSpent.Core.Entities.User"/>
 /// </summary>
 [Table("Users")]
-public class UserModel
+public class UserDbModel
 {
     /// <summary>
     /// Identifier
     /// </summary>
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
     /// <summary>

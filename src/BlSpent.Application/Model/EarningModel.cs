@@ -7,6 +7,8 @@ namespace BlSpent.Application.Model;
 /// </summary>
 public class EarningModel
 {
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Costs date
     /// </summary>

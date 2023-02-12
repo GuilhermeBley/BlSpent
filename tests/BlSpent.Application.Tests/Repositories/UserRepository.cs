@@ -2,7 +2,9 @@ using AutoMapper;
 using BlSpent.Application.Model;
 using BlSpent.Application.Repository;
 using BlSpent.Application.Tests.InMemoryDb;
+using BlSpent.Application.Tests.Models;
 using BlSpent.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlSpent.Application.Tests.Repositories;
 
@@ -13,33 +15,72 @@ internal class UserRepository : RepositoryBase, IUserRepository
     {
     }
 
-    public Task<UserModel> Add(User entity)
+    public async Task<UserModel> Add(User entity)
     {
-        throw new NotImplementedException();
+        var userModel = _mapper.Map<UserDbModel>(entity);
+
+        await _context.Users.AddAsync(userModel);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<UserModel>(userModel);;
     }
 
-    public Task<IEnumerable<UserModel>> GetAll()
+    public async Task<IEnumerable<UserModel>> GetAll()
     {
-        throw new NotImplementedException();
+        return (await _context.Users.ToListAsync())
+            .Select(userDb => _mapper.Map<UserModel>(userDb));
     }
 
-    public Task<UserModel> GetByEmail(string email)
+    public async Task<UserModel?> GetByEmail(string email)
     {
-        throw new NotImplementedException();
+        var userDb = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        if (userDb is null)
+            return null;
+
+        return _mapper.Map<UserModel>(userDb);
     }
 
-    public Task<UserModel?> GetByIdOrDefault(Guid id)
+    public async Task<UserModel?> GetByIdOrDefault(Guid id)
     {
-        throw new NotImplementedException();
+        var userDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (userDb is null)
+            return null;
+
+        return _mapper.Map<UserModel>(userDb);
     }
 
-    public Task<UserModel?> RemoveByIdOrDefault(Guid id)
+    public async Task<UserModel?> RemoveByIdOrDefault(Guid id)
     {
-        throw new NotImplementedException();
+        var userDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (userDb is null)
+            return null;
+
+        _context.Users.Remove(userDb);
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<UserModel>(userDb);
     }
 
-    public Task<UserModel?> UpdateByIdOrDefault(Guid id, User entity)
+    public async Task<UserModel?> UpdateByIdOrDefault(Guid id, User entity)
     {
-        throw new NotImplementedException();
+        var userDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (userDb is null)
+            return null;
+
+        var userToUpdate = _mapper.Map<UserDbModel>(entity);
+        userToUpdate.Id = userDb.Id;
+
+        _context.Users.Update(userToUpdate);
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<UserModel>(
+            await _context.Users.FirstOrDefaultAsync(u => u.Id == id)
+        );
     }
 }

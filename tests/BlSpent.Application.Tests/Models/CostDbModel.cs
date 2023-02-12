@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlSpent.Application.Tests.Models;
@@ -6,8 +7,10 @@ namespace BlSpent.Application.Tests.Models;
 /// Model of <see cref="BlSpent.Core.Entities.Cost"/>
 /// </summary>
 [Table("Costs")]
-public class CostModel
+public class CostDbModel
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     
     /// <summary>
@@ -29,5 +32,5 @@ public class CostModel
     /// Identifier of page
     /// </summary>
     public Guid PageId { get; }
-    public PageModel PageModel { get; set; } = null!;
+    public PageDbModel PageModel { get; set; } = null!;
 }

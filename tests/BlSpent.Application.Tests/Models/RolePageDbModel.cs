@@ -7,25 +7,26 @@ namespace BlSpent.Application.Tests.Models;
 /// Model of <see cref="BlSpent.Core.Entities.RolePage"/>
 /// </summary>
 [Table("RolesPages")]
-public class RolePageModel
+public class RolePageDbModel
 {
     /// <summary>
     /// Id
     /// </summary>
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
     /// <summary>
     /// User id
     /// </summary>
     public Guid UserId { get; set; }
-    public UserModel UserModel { get; set; } = null!;
+    public UserDbModel UserModel { get; set; } = null!;
 
     /// <summary>
     /// Page Id
     /// </summary>
     public Guid PageId { get; set; }
-    public PageModel PageModel { get; set; } = null!;
+    public PageDbModel PageModel { get; set; } = null!;
 
     /// <summary>
     /// Role page

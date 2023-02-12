@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlSpent.Application.Tests.Models;
@@ -6,8 +7,12 @@ namespace BlSpent.Application.Tests.Models;
 /// Model of <see cref="BlSpent.Core.Entities.Earning"/>
 /// </summary>
 [Table("Earnings")]
-public class GoalModel
+public class GoalDbModel
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
+    
     /// <summary>
     /// Target date to goal
     /// </summary>
@@ -22,5 +27,5 @@ public class GoalModel
     /// Identifier of page
     /// </summary>
     public Guid PageId { get; set; }
-    public PageModel PageModel { get; set; } = null!;
+    public PageDbModel PageModel { get; set; } = null!;
 }
