@@ -8,7 +8,7 @@ namespace BlSpent.Application.Tests.Hosts;
 public class DefaultHost
 {
     private IServiceProvider _serviceProvider;
-    public IServiceProvider ServiceProvider => _serviceProvider;
+    public IServiceProvider ServiceProvider => _serviceProvider.CreateScope().ServiceProvider;
 
     public DefaultHost()
         => _serviceProvider = Host.CreateDefaultBuilder()

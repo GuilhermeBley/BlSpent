@@ -27,7 +27,7 @@ internal class TestContext : ISecurityContext
         }
     }
     
-    internal TestContext() { }
+    public TestContext() { }
 
     /// <summary>
     /// Private unique holder class to context
