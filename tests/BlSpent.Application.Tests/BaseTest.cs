@@ -21,4 +21,11 @@ public abstract class BaseTest : Hosts.DefaultHost
             
             .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
             .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>();
+
+    protected void SetContext(Model.UserModel? user = null)
+    {
+        var context =
+            ServiceProvider.GetRequiredService<Context.TestContext>();
+        context.ClaimContext = new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, null, null, DateTime.MaxValue);
+    }
 }

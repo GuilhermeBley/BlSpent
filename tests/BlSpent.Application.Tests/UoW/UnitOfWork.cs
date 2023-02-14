@@ -7,7 +7,6 @@ namespace BlSpent.Application.Tests.UoW;
 internal class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
-    private IDbContextTransaction? _transaction;
 
     public Guid IdSession { get; } = Guid.NewGuid();
 
@@ -18,20 +17,13 @@ internal class UnitOfWork : IUnitOfWork
 
     public async Task<IUnitOfWork> BeginTransactionAsync()
     {
-        _transaction ??= await _context.Database.BeginTransactionAsync();
+        await Task.CompletedTask;
         return this;
     }
 
     public void Dispose()
     {
-        try
-        {
-            _transaction?.Dispose();
-        }
-        finally
-        {
-            _transaction = null;
-        }
+       
     }
 
     public async Task<IUnitOfWork> OpenConnectionAsync()
@@ -42,27 +34,11 @@ internal class UnitOfWork : IUnitOfWork
 
     public async Task RollBackAsync()
     {
-        try
-        {
-            if (_transaction is not null)
-                await _transaction.RollbackAsync();
-        }
-        finally
-        {
-            _transaction = null;
-        }
+        await Task.CompletedTask;
     }
 
     public async Task SaveChangesAsync()
     {
-        try
-        {
-            if (_transaction is not null)
-                await _transaction.CommitAsync();
-        }
-        finally
-        {
-            _transaction = null;
-        }
+        await Task.CompletedTask;
     }
 }
