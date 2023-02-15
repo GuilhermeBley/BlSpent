@@ -72,7 +72,7 @@ internal class CostRepository : RepositoryBase, ICostRepository
         costDb.CostDate = costToUpdate.CostDate;
         costDb.EntryBaseDate = costToUpdate.EntryBaseDate;
         costDb.PageId = costToUpdate.PageId;
-        costDb.Value = costDb.Value;
+        costDb.Value = costToUpdate.Value;
 
         _context.Costs.Update(costDb);
 
