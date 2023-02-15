@@ -108,6 +108,28 @@ public class UserServiceTest : BaseTest
             await userService.GetByIdOrDefault(userCreated.Id)
         );
     }
+    
+    [Fact]
+    public async Task Update_TryUpdateUser_Success()
+    {
+        var userService =
+            ServiceProvider.GetRequiredService<IUserService>();
+
+        var userToCreate = ValidUser();
+        var userCreated = await userService.Create(userToCreate);
+
+        var userToUpdate = userCreated;
+        var oldName = userToUpdate.Name;
+        userToUpdate.Name = "Updated"+userToUpdate.Name;
+
+        SetContext(userCreated);
+
+        await userService.Update(userCreated.Id, userToUpdate);
+
+        var userUpdated = await userService.GetByIdOrDefault(userCreated.Id);
+
+        Assert.NotEqual(userUpdated?.Name, oldName);
+    }
 
     private static UserModel ValidUser()
         => new UserModel

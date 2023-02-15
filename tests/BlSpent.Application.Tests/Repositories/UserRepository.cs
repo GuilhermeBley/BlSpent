@@ -73,9 +73,20 @@ internal class UserRepository : RepositoryBase, IUserRepository
             return null;
 
         var userToUpdate = _mapper.Map<UserDbModel>(entity);
-        userToUpdate.Id = userDb.Id;
+        userDb.AccessFailedCount = userToUpdate.AccessFailedCount;
+        userDb.Email = userToUpdate.Email;
+        userDb.EmailConfirmed = userToUpdate.EmailConfirmed;
+        userDb.LastName = userToUpdate.LastName;
+        userDb.LockOutEnabled = userToUpdate.LockOutEnabled;
+        userDb.Name = userToUpdate.Name;
+        userDb.PasswordHash = userToUpdate.PasswordHash;
+        userDb.PhoneNumber = userToUpdate.PhoneNumber;
+        userDb.PhoneNumberConfirmed = userToUpdate.PhoneNumberConfirmed;
+        userDb.Salt = userToUpdate.Salt;
+        userDb.TwoFactoryEnabled = userToUpdate.TwoFactoryEnabled;
+        userDb.UserName = userToUpdate.UserName;
 
-        _context.Users.Update(userToUpdate);
+        _context.Users.Update(userDb);
 
         await _context.SaveChangesAsync();
 
