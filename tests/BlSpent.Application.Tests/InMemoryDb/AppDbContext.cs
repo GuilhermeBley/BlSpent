@@ -10,7 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<RolePageDbModel> RolesPages { get; set; } = null!;
     public DbSet<CostDbModel> Costs { get; set; } = null!;
     public DbSet<EarningDbModel> Earnings { get; set; } = null!;
-    public DbSet<GoalDbModel> GoalModels { get; set; } = null!;
+    public DbSet<GoalDbModel> Goals { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
