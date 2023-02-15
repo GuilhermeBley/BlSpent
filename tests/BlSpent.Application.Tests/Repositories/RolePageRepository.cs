@@ -155,9 +155,12 @@ internal class RolePageRepository : RepositoryBase, IRolePageRepository
             return null;
 
         var rolePageToUpdate = _mapper.Map<RolePageDbModel>(entity);
-        rolePageToUpdate.Id = rolePageDb.Id;
+        rolePageDb.CreateDate = rolePageToUpdate.CreateDate;
+        rolePageDb.PageId = rolePageToUpdate.PageId;
+        rolePageDb.Role = rolePageToUpdate.Role;
+        rolePageDb.UserId = rolePageToUpdate.UserId;
 
-        _context.RolesPages.Update(rolePageToUpdate);
+        _context.RolesPages.Update(rolePageDb);
 
         await _context.SaveChangesAsync();
 

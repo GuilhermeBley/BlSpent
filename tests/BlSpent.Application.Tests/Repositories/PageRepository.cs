@@ -76,9 +76,11 @@ internal class PageRepository : RepositoryBase, IPageRepository
             return null;
 
         var pageToUpdate = _mapper.Map<PageDbModel>(entity);
-        pageToUpdate.Id = pageDb.Id;
+        pageDb.ConcurrencyStamp = pageToUpdate.ConcurrencyStamp;
+        pageDb.CreateDate = pageToUpdate.CreateDate;
+        pageDb.PageName = pageToUpdate.PageName;
 
-        _context.Pages.Update(pageToUpdate);
+        _context.Pages.Update(pageDb);
 
         await _context.SaveChangesAsync();
 
