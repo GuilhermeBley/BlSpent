@@ -72,7 +72,7 @@ internal class EarningRepository : RepositoryBase, IEarningRepository
         earningDb.EarnDate = earningToUpdate.EarnDate;
         earningDb.EntryBaseDate = earningToUpdate.EntryBaseDate;
         earningDb.PageId = earningToUpdate.PageId;
-        earningDb.Value = earningDb.Value;
+        earningDb.Value = earningToUpdate.Value;
 
         _context.Earnings.Update(earningDb);
 
