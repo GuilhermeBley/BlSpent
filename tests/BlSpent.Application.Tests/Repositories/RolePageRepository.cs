@@ -147,8 +147,22 @@ internal class RolePageRepository : RepositoryBase, IRolePageRepository
         return _mapper.Map<RolePageModel>(rolePageDb);
     }
 
-    public Task<RolePageModel?> UpdateByIdOrDefault(Guid id, RolePage entity)
+    public async Task<RolePageModel?> UpdateByIdOrDefault(Guid id, RolePage entity)
     {
-        throw new NotImplementedException();
+        var rolePageDb = await _context.RolesPages.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (rolePageDb is null)
+            return null;
+
+        var rolePageToUpdate = _mapper.Map<RolePageDbModel>(entity);
+        rolePageToUpdate.Id = rolePageDb.Id;
+
+        _context.RolesPages.Update(rolePageToUpdate);
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<RolePageModel>(
+            await _context.RolesPages.FirstOrDefaultAsync(u => u.Id == id)
+        );
     }
 }
