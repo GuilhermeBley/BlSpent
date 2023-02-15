@@ -18,9 +18,11 @@ public abstract class BaseTest : Hosts.DefaultHost
             
             .AddScoped<Application.Repository.IUserRepository, Repositories.UserRepository>()
             .AddScoped<Application.Repository.IPageRepository, Repositories.PageRepository>()
+            .AddScoped<Application.Repository.IRolePageRepository, Repositories.RolePageRepository>()
             
             .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
-            .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>();
+            .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>()
+            .AddScoped<Application.Services.Interfaces.IRolePageService, Application.Services.Implementation.RolePageService>();
 
     protected void SetContext(Model.UserModel? user = null)
     {
