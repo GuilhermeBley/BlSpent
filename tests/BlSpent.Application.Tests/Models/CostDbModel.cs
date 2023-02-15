@@ -31,6 +31,6 @@ public class CostDbModel
     /// <summary>
     /// Identifier of page
     /// </summary>
-    public Guid PageId { get; }
+    public Guid PageId { get; set; }
     public PageDbModel PageModel { get; set; } = null!;
 }
