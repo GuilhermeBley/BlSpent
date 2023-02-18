@@ -26,7 +26,10 @@ public abstract class BaseTest : Hosts.DefaultHost
             
             .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
             .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>()
-            .AddScoped<Application.Services.Interfaces.IRolePageService, Application.Services.Implementation.RolePageService>();
+            .AddScoped<Application.Services.Interfaces.IRolePageService, Application.Services.Implementation.RolePageService>()
+            .AddScoped<Application.Services.Interfaces.ICostService, Application.Services.Implementation.CostService>()
+            .AddScoped<Application.Services.Interfaces.IGoalService, Application.Services.Implementation.GoalService>()
+            .AddScoped<Application.Services.Interfaces.IEarningService, Application.Services.Implementation.EarningService>();
 
     protected void SetContext(Model.UserModel? user = null)
     {
