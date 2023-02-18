@@ -50,6 +50,11 @@ public class ClaimModel
     /// </summary>
     public bool IsInvite { get; }
 
+    /// <summary>
+    /// Check if a request to change the password
+    /// </summary>
+    public bool IsNotRememberPassword { get; }
+
     private ClaimModel() { }
 
     public ClaimModel(Guid? userId, string? email, string? name, string? lastName, Guid? pageId, string? accessType, DateTime? expires)

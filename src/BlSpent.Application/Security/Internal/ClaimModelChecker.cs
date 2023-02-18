@@ -65,6 +65,12 @@ internal class ClaimModelChecker
             throw new ForbiddenCoreException("Only owners can access this resource.");
     }
 
+    public async Task ThrowIfIsntNotRememberPassword()
+    {
+        if (!IsNotRememberPassword(await _securityContext.GetCurrentClaim()))
+            throw new ForbiddenCoreException("Only requests to change password are permitted.");
+    }
+
     public async Task ThrowIfIsntInvitation()
     {
         if (!IsInvite(await _securityContext.GetCurrentClaim()))
@@ -176,8 +182,6 @@ internal class ClaimModelChecker
     /// <summary>
     /// Checks if user contains invitation
     /// </summary>
-    /// <param name="claimModel">claim model to check</param>
-    /// <returns>true is owner, otherwise, isn't</returns>
     private static bool IsInvite(ClaimModel? claimModel)
     {
         if (claimModel is null ||
@@ -185,6 +189,21 @@ internal class ClaimModelChecker
             return false;
 
         if (claimModel.IsInvite)
+            return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if user request to change not remembered password
+    /// </summary>
+    private static bool IsNotRememberPassword(ClaimModel? claimModel)
+    {
+        if (claimModel is null ||
+            !IsAuthorizedInPage(claimModel))
+            return false;
+
+        if (claimModel.IsNotRememberPassword)
             return true;
 
         return false;
