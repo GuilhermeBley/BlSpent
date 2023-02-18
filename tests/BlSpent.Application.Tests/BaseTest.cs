@@ -19,6 +19,10 @@ public abstract class BaseTest : Hosts.DefaultHost
             .AddScoped<Application.Repository.IUserRepository, Repositories.UserRepository>()
             .AddScoped<Application.Repository.IPageRepository, Repositories.PageRepository>()
             .AddScoped<Application.Repository.IRolePageRepository, Repositories.RolePageRepository>()
+            .AddScoped<Application.Repository.ICostRepository, Repositories.CostRepository>()
+            .AddScoped<Application.Repository.IGoalRepository, Repositories.GoalRepository>()
+            .AddScoped<Application.Repository.IEarningRepository, Repositories.EarningRepository>()
+
             
             .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
             .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>()
