@@ -42,4 +42,7 @@ public interface IUserService
     /// <returns>User model found.</returns>
     /// <exception cref="Core.Exceptions.UnauthorizedCoreException"></exception>
     Task<UserModel> GetByEmailAndPassword(string email, string password);
+
+    Task<UserModel> UpdatePasswordForgot(Guid id, string newPassword);
+    Task<UserModel> UpdatePassword(Guid id, string oldPassword, string newPassword);
 }

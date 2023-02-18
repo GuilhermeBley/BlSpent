@@ -99,7 +99,11 @@ public class UserService : BaseService, IUserService
         if (id != currentUser.UserId)
             throw new Core.Exceptions.ForbiddenCoreException("Current user can't access this Id.");
 
-        var entityUser = CreateUserWithHashedPassword(userModel);
+        userModel.PasswordHash = string.Empty;
+        userModel.Password = string.Empty;
+        userModel.Salt = string.Empty;
+
+        var entityUser = CreateUserWithoutPassword(userModel);
 
         using var transaction = await _uoW.BeginTransactionAsync();
 
@@ -111,6 +115,72 @@ public class UserService : BaseService, IUserService
         await transaction.SaveChangesAsync();
 
         return userUpdated;
+    }
+    
+    public async Task<UserModel> UpdatePasswordForgot(Guid id, string newPassword)
+    {
+        if (id == default)
+            throw new Core.Exceptions.GenericCoreException("Invalid id.");
+
+        await _securityChecker.ThrowIfIsntNotRememberPassword();
+
+        var currentUser = await _securityContext.GetCurrentClaim() 
+            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+
+        if (id != currentUser.UserId)
+            throw new Core.Exceptions.ForbiddenCoreException("Current user can't access this Id.");
+
+        var userModelToUpdatePassword =
+            await _userRepository.GetByIdOrDefault(id)
+            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+
+        userModelToUpdatePassword.Password = newPassword;
+        userModelToUpdatePassword.PasswordHash = string.Empty;
+        userModelToUpdatePassword.Salt = string.Empty;
+
+        var userEntityToUpdate = CreateUserWithHashedPassword(userModelToUpdatePassword);
+
+        var userPasswordUpdated = await _userRepository.UpdatePasswordByIdOrDefault(id, userEntityToUpdate);
+
+        userPasswordUpdated.PasswordHash = string.Empty;
+        userPasswordUpdated.Salt = string.Empty;
+
+        return userPasswordUpdated;
+    }
+    
+    public async Task<UserModel> UpdatePassword(Guid id, string oldPassword, string newPassword)
+    {
+        if (id == default)
+            throw new Core.Exceptions.GenericCoreException("Invalid id.");
+
+        await _securityChecker.ThrowIfIsntLogged();
+
+        var currentUser = await _securityContext.GetCurrentClaim() 
+            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+
+        if (id != currentUser.UserId)
+            throw new Core.Exceptions.ForbiddenCoreException("Current user can't access this Id.");
+
+        var userModelToUpdatePassword =
+            await _userRepository.GetByIdOrDefault(id)
+            ?? throw new Core.Exceptions.UnauthorizedCoreException();
+
+        if (!PasswordCrypt.IsValidPassword(oldPassword, 
+            userModelToUpdatePassword.PasswordHash, userModelToUpdatePassword.Salt))
+            throw new Core.Exceptions.UnauthorizedCoreException();
+
+        userModelToUpdatePassword.Password = newPassword;
+        userModelToUpdatePassword.PasswordHash = string.Empty;
+        userModelToUpdatePassword.Salt = string.Empty;
+
+        var userEntityToUpdate = CreateUserWithHashedPassword(userModelToUpdatePassword);
+
+        var userPasswordUpdated = await _userRepository.UpdatePasswordByIdOrDefault(id, userEntityToUpdate);
+
+        userPasswordUpdated.PasswordHash = string.Empty;
+        userPasswordUpdated.Salt = string.Empty;
+
+        return userPasswordUpdated;
     }
 
     public async Task<UserModel> GetByEmailAndPassword(string email, string password)
@@ -132,6 +202,17 @@ public class UserService : BaseService, IUserService
         userToCheckPassword.Salt = string.Empty;
 
         return userToCheckPassword;
+    }
+    
+    private Core.Entities.User CreateUserWithoutPassword(UserModel? userModel)
+    {
+        if (userModel is null)
+            throw new Core.Exceptions.GenericCoreException("Empty user.");
+
+        return Core.Entities.User.CreateWithOutPassword(userModel.Email, userModel.EmailConfirmed, 
+            userModel.PhoneNumber, userModel.PhoneNumberConfirmed, userModel.TwoFactoryEnabled, 
+            userModel.LockOutEnd, userModel.LockOutEnabled, userModel.AccessFailedCount, userModel.Name, 
+            userModel.LastName);
     }
 
     private Core.Entities.User CreateUserWithHashedPassword(UserModel? userModel)

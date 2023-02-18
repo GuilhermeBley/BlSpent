@@ -208,7 +208,7 @@ public class User : Entity
 
         return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
             twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), 
-            password, passwordHash, passwordSalt);
+            new char[0], passwordHash, passwordSalt);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public class User : Entity
     /// <param name="lastName"><inheritdoc cref="LastName" path="/summary"/></param>
     /// <param name="password"><inheritdoc cref="Password" path="/summary"/></param>
     /// <returns>new <see cref="User"/></returns>
-    public static User CreateWithHashAndSalt(
+    public static User CreateWithOutPassword(
         string email, 
         bool emailConfirmed, 
         string? phoneNumber, 
@@ -236,22 +236,16 @@ public class User : Entity
         bool lockOutEnabled, 
         int accessFailedCount, 
         string name, 
-        string lastName,
-        string passwordHash,
-        string passwordSalt)
+        string lastName)
     {
         var id = Guid.NewGuid();
 
         CheckFields(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, twoFactoryEnabled, 
             lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName);
 
-        if (string.IsNullOrWhiteSpace(passwordHash) ||
-            string.IsNullOrWhiteSpace(passwordSalt))
-            throw CreateInvalidPasswordCoreException;
-
         return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
             twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), 
-            new char[0], passwordHash, passwordSalt);
+            new char[0], string.Empty, string.Empty);
     }
 
     /// <inheritdoc cref="Create(string, bool, string?, bool, bool, DateTime?, bool, int, string, string, char[])" path="*"/>
