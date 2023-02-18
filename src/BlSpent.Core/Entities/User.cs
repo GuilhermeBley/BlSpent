@@ -211,6 +211,49 @@ public class User : Entity
             password, passwordHash, passwordSalt);
     }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="User"/>
+    /// </summary>
+    /// <param name="email"><inheritdoc cref="Email" path="/summary"/></param>
+    /// <param name="emailConfirmed"><inheritdoc cref="EmailConfirmed" path="/summary"/></param>
+    /// <param name="phoneNumber"><inheritdoc cref="PhoneNumber" path="/summary"/></param>
+    /// <param name="phoneNumberConfirmed"><inheritdoc cref="PhoneNumberConfirmed" path="/summary"/></param>
+    /// <param name="twoFactoryEnabled"><inheritdoc cref="TwoFactoryEnabled" path="/summary"/></param>
+    /// <param name="lockOutEnd"><inheritdoc cref="LockOutEnd" path="/summary"/></param>
+    /// <param name="lockOutEnabled"><inheritdoc cref="LockOutEnabled" path="/summary"/></param>
+    /// <param name="accessFailedCount"><inheritdoc cref="AccessFailedCount" path="/summary"/></param>
+    /// <param name="name"><inheritdoc cref="Name" path="/summary"/></param>
+    /// <param name="lastName"><inheritdoc cref="LastName" path="/summary"/></param>
+    /// <param name="password"><inheritdoc cref="Password" path="/summary"/></param>
+    /// <returns>new <see cref="User"/></returns>
+    public static User CreateWithHashAndSalt(
+        string email, 
+        bool emailConfirmed, 
+        string? phoneNumber, 
+        bool phoneNumberConfirmed, 
+        bool twoFactoryEnabled, 
+        DateTime? lockOutEnd, 
+        bool lockOutEnabled, 
+        int accessFailedCount, 
+        string name, 
+        string lastName,
+        string passwordHash,
+        string passwordSalt)
+    {
+        var id = Guid.NewGuid();
+
+        CheckFields(email, emailConfirmed, phoneNumber, phoneNumberConfirmed, twoFactoryEnabled, 
+            lockOutEnd, lockOutEnabled, accessFailedCount, name, lastName);
+
+        if (string.IsNullOrWhiteSpace(passwordHash) ||
+            string.IsNullOrWhiteSpace(passwordSalt))
+            throw CreateInvalidPasswordCoreException;
+
+        return new User(id, email.Trim(), emailConfirmed, phoneNumber, phoneNumberConfirmed, 
+            twoFactoryEnabled, lockOutEnd, lockOutEnabled, accessFailedCount, name.Trim(), lastName.Trim(), 
+            new char[0], passwordHash, passwordSalt);
+    }
+
     /// <inheritdoc cref="Create(string, bool, string?, bool, bool, DateTime?, bool, int, string, string, char[])" path="*"/>
     public static User Create(
         string email, 

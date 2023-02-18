@@ -94,4 +94,9 @@ internal class UserRepository : RepositoryBase, IUserRepository
             await _context.Users.FirstOrDefaultAsync(u => u.Id == id)
         );
     }
+
+    public Task<UserModel> UpdatePasswordByIdOrDefault(Guid id, User entity)
+    {
+        throw new NotImplementedException();
+    }
 }
