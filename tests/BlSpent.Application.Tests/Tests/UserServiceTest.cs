@@ -130,13 +130,76 @@ public class UserServiceTest : BaseTest
 
         Assert.NotEqual(userUpdated?.Name, oldName);
     }
+    
+    [Fact]
+    public async Task Update_TryUpdateUserAndCheckLogin_Success()
+    {
+        var userService =
+            ServiceProvider.GetRequiredService<IUserService>();
+
+        var userToCreate = ValidUser();
+        var userCreated = await userService.Create(userToCreate);
+
+        var userToUpdate = userCreated;
+        var oldName = userToUpdate.Name;
+        userToUpdate.Name = "Updated"+userToUpdate.Name;
+
+        SetContext(userCreated);
+
+        await userService.Update(userCreated.Id, userToUpdate);
+
+        var userUpdated = await userService.GetByEmailAndPassword(userToCreate.Email, userToCreate.Password);
+
+        Assert.NotNull(userUpdated);
+    }
+    
+    [Fact]
+    public async Task UpdatePassword_TryUpdateUserAndCheckLogin_Success()
+    {
+        var userService =
+            ServiceProvider.GetRequiredService<IUserService>();
+
+        var userToCreate = ValidUser();
+        var userCreated = await userService.Create(userToCreate);
+
+        SetContext(userCreated);
+
+        var newDifferentPassword = NewValidPassword() + "123";
+        await userService.UpdatePassword(userCreated.Id, userToCreate.Password, newDifferentPassword);
+
+        var userUpdated = await userService.GetByEmailAndPassword(userToCreate.Email, newDifferentPassword);
+
+        Assert.NotNull(userUpdated);
+    }
+    
+    [Fact]
+    public async Task UpdatePasswordForgot_TryUpdateUserAndCheckLogin_Success()
+    {
+        var userService =
+            ServiceProvider.GetRequiredService<IUserService>();
+
+        var userToCreate = ValidUser();
+        var userCreated = await userService.Create(userToCreate);
+
+        SetContext(userCreated, isNotRememberPassword: true);
+
+        var newDifferentPassword = NewValidPassword() + "123";
+        await userService.UpdatePasswordForgot(userCreated.Id, newDifferentPassword);
+
+        var userUpdated = await userService.GetByEmailAndPassword(userToCreate.Email, newDifferentPassword);
+
+        Assert.NotNull(userUpdated);
+    }
 
     private static UserModel ValidUser()
         => new UserModel
         {
-            Password = "a1@12345678",
+            Password = NewValidPassword(),
             Email = $"{Guid.NewGuid()}@email.com",
             Name = "name",
             LastName = "last name"
         };
+
+    private static string NewValidPassword()
+        => "a1@12345678";
 }

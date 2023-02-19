@@ -31,10 +31,11 @@ public abstract class BaseTest : Hosts.DefaultHost
             .AddScoped<Application.Services.Interfaces.IGoalService, Application.Services.Implementation.GoalService>()
             .AddScoped<Application.Services.Interfaces.IEarningService, Application.Services.Implementation.EarningService>();
 
-    protected void SetContext(Model.UserModel? user = null)
+    protected void SetContext(Model.UserModel? user = null, bool isNotRememberPassword = false)
     {
         var context =
             ServiceProvider.GetRequiredService<Context.TestContext>();
-        context.ClaimContext = new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, null, null, DateTime.MaxValue);
+        context.ClaimContext = new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, null, null, DateTime.MaxValue, 
+            isNotRememberPassword: isNotRememberPassword);
     }
 }

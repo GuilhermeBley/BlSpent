@@ -24,5 +24,5 @@ public interface IUserRepository : IBaseRepository<UserModel, User, Guid>
     /// <param name="id">id to update</param>
     /// <param name="entity">data with password to update</param>
     /// <returns>model updated, or null if don't find</returns>
-    Task<UserModel> UpdatePasswordByIdOrDefault(Guid id, User entity);
+    Task<UserModel?> UpdatePasswordByIdOrDefault(Guid id, User entity);
 }

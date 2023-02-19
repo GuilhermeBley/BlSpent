@@ -68,7 +68,7 @@ internal class ClaimModelChecker
     public async Task ThrowIfIsntNotRememberPassword()
     {
         if (!IsNotRememberPassword(await _securityContext.GetCurrentClaim()))
-            throw new ForbiddenCoreException("Only requests to change password are permitted.");
+            throw new ForbiddenCoreException("Only claims 'Not remember password' are permitted.");
     }
 
     public async Task ThrowIfIsntInvitation()
@@ -200,7 +200,7 @@ internal class ClaimModelChecker
     private static bool IsNotRememberPassword(ClaimModel? claimModel)
     {
         if (claimModel is null ||
-            !IsAuthorizedInPage(claimModel))
+            !IsLogged(claimModel))
             return false;
 
         if (claimModel.IsNotRememberPassword)

@@ -57,7 +57,9 @@ public class ClaimModel
 
     private ClaimModel() { }
 
-    public ClaimModel(Guid? userId, string? email, string? name, string? lastName, Guid? pageId, string? accessType, DateTime? expires)
+    public ClaimModel(
+        Guid? userId, string? email, string? name, string? lastName, Guid? pageId, 
+        string? accessType, DateTime? expires, bool isInvite = false, bool isNotRememberPassword = false)
     {
         UserId = userId;
         Name = name;
@@ -66,5 +68,7 @@ public class ClaimModel
         PageId = pageId;
         AccessType = accessType;
         Expires = expires;
+        IsInvite = isInvite;
+        IsNotRememberPassword = isNotRememberPassword;
     }
 }

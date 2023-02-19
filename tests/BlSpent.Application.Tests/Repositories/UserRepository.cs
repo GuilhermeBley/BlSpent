@@ -79,10 +79,8 @@ internal class UserRepository : RepositoryBase, IUserRepository
         userDb.LastName = userToUpdate.LastName;
         userDb.LockOutEnabled = userToUpdate.LockOutEnabled;
         userDb.Name = userToUpdate.Name;
-        userDb.PasswordHash = userToUpdate.PasswordHash;
         userDb.PhoneNumber = userToUpdate.PhoneNumber;
         userDb.PhoneNumberConfirmed = userToUpdate.PhoneNumberConfirmed;
-        userDb.Salt = userToUpdate.Salt;
         userDb.TwoFactoryEnabled = userToUpdate.TwoFactoryEnabled;
         userDb.UserName = userToUpdate.UserName;
 
@@ -95,8 +93,23 @@ internal class UserRepository : RepositoryBase, IUserRepository
         );
     }
 
-    public Task<UserModel> UpdatePasswordByIdOrDefault(Guid id, User entity)
+    public async Task<UserModel?> UpdatePasswordByIdOrDefault(Guid id, User entity)
     {
-        throw new NotImplementedException();
+        var userDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (userDb is null)
+            return null;
+
+        var userToUpdate = _mapper.Map<UserDbModel>(entity);
+        userDb.PasswordHash = userToUpdate.PasswordHash;
+        userDb.Salt = userToUpdate.Salt;
+
+        _context.Users.Update(userDb);
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<UserModel>(
+            await _context.Users.FirstOrDefaultAsync(u => u.Id == id)
+        );
     }
 }

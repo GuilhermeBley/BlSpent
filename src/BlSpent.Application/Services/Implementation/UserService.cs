@@ -130,6 +130,8 @@ public class UserService : BaseService, IUserService
         if (id != currentUser.UserId)
             throw new Core.Exceptions.ForbiddenCoreException("Current user can't access this Id.");
 
+        using var transaction = await _uoW.BeginTransactionAsync();
+
         var userModelToUpdatePassword =
             await _userRepository.GetByIdOrDefault(id)
             ?? throw new Core.Exceptions.UnauthorizedCoreException();
@@ -140,10 +142,13 @@ public class UserService : BaseService, IUserService
 
         var userEntityToUpdate = CreateUserWithHashedPassword(userModelToUpdatePassword);
 
-        var userPasswordUpdated = await _userRepository.UpdatePasswordByIdOrDefault(id, userEntityToUpdate);
+        var userPasswordUpdated = await _userRepository.UpdatePasswordByIdOrDefault(id, userEntityToUpdate)
+            ?? throw new Core.Exceptions.NotFoundCoreException("User not found.");
 
         userPasswordUpdated.PasswordHash = string.Empty;
         userPasswordUpdated.Salt = string.Empty;
+
+        await _uoW.SaveChangesAsync();
 
         return userPasswordUpdated;
     }
@@ -161,6 +166,8 @@ public class UserService : BaseService, IUserService
         if (id != currentUser.UserId)
             throw new Core.Exceptions.ForbiddenCoreException("Current user can't access this Id.");
 
+        using var transaction = await _uoW.BeginTransactionAsync();
+
         var userModelToUpdatePassword =
             await _userRepository.GetByIdOrDefault(id)
             ?? throw new Core.Exceptions.UnauthorizedCoreException();
@@ -175,10 +182,13 @@ public class UserService : BaseService, IUserService
 
         var userEntityToUpdate = CreateUserWithHashedPassword(userModelToUpdatePassword);
 
-        var userPasswordUpdated = await _userRepository.UpdatePasswordByIdOrDefault(id, userEntityToUpdate);
+        var userPasswordUpdated = await _userRepository.UpdatePasswordByIdOrDefault(id, userEntityToUpdate)
+            ?? throw new Core.Exceptions.NotFoundCoreException("User not found.");
 
         userPasswordUpdated.PasswordHash = string.Empty;
         userPasswordUpdated.Salt = string.Empty;
+
+        await _uoW.SaveChangesAsync();
 
         return userPasswordUpdated;
     }
