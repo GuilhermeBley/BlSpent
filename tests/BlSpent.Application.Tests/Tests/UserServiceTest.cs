@@ -14,7 +14,7 @@ public class UserServiceTest : BaseTest
 
         Assert.NotNull(
             await userService.Create(
-                ValidUser()
+                Mocks.UserMock.ValidUser()
             )
         );
     }
@@ -25,7 +25,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userWithInvalidPassword = ValidUser();
+        var userWithInvalidPassword = Mocks.UserMock.ValidUser();
         userWithInvalidPassword.Password = string.Empty;
 
         await Assert.ThrowsAnyAsync<Core.Exceptions.GenericCoreException>(
@@ -41,7 +41,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userWithInvalidEmail = ValidUser();
+        var userWithInvalidEmail = Mocks.UserMock.ValidUser();
         userWithInvalidEmail.Email = "Invalid-Email";
 
         await Assert.ThrowsAnyAsync<Core.Exceptions.GenericCoreException>(
@@ -57,7 +57,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         await userService.Create(userToCreate);
 
         Assert.NotNull(
@@ -71,7 +71,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         await userService.Create(userToCreate);
 
         await Assert.ThrowsAnyAsync<Core.Exceptions.UnauthorizedCoreException>(
@@ -85,7 +85,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         await userService.Create(userToCreate);
         
         await Assert.ThrowsAnyAsync<Core.Exceptions.UnauthorizedCoreException>(
@@ -99,7 +99,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
         using var context = CreateContext(userCreated);
@@ -115,7 +115,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
         var userToUpdate = userCreated;
@@ -137,7 +137,7 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
         var userToUpdate = userCreated;
@@ -159,12 +159,12 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
         using var context = CreateContext(userCreated);
 
-        var newDifferentPassword = NewValidPassword() + "123";
+        var newDifferentPassword = Mocks.UserMock.NewValidPassword() + "123";
         await userService.UpdatePassword(userCreated.Id, userToCreate.Password, newDifferentPassword);
 
         var userUpdated = await userService.GetByEmailAndPassword(userToCreate.Email, newDifferentPassword);
@@ -178,28 +178,16 @@ public class UserServiceTest : BaseTest
         var userService =
             ServiceProvider.GetRequiredService<IUserService>();
 
-        var userToCreate = ValidUser();
+        var userToCreate = Mocks.UserMock.ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
         using var context = CreateContext(userCreated, isNotRememberPassword: true);
 
-        var newDifferentPassword = NewValidPassword() + "123";
+        var newDifferentPassword = Mocks.UserMock.NewValidPassword() + "123";
         await userService.UpdatePasswordForgot(userCreated.Id, newDifferentPassword);
 
         var userUpdated = await userService.GetByEmailAndPassword(userToCreate.Email, newDifferentPassword);
 
         Assert.NotNull(userUpdated);
     }
-
-    private static UserModel ValidUser()
-        => new UserModel
-        {
-            Password = NewValidPassword(),
-            Email = $"{Guid.NewGuid()}@email.com",
-            Name = "name",
-            LastName = "last name"
-        };
-
-    private static string NewValidPassword()
-        => "a1@12345678";
 }

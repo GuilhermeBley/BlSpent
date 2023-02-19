@@ -33,10 +33,13 @@ public abstract class BaseTest : Hosts.DefaultHost
             .AddScoped<Application.Services.Interfaces.IGoalService, Application.Services.Implementation.GoalService>()
             .AddScoped<Application.Services.Interfaces.IEarningService, Application.Services.Implementation.EarningService>();
 
-    protected InternalContext CreateContext(Model.UserModel? user = null, bool isNotRememberPassword = false)
+    protected InternalContext CreateContext(
+        Model.UserModel? user = null, 
+        Model.RolePageModel? rolePageModel = null,
+        bool isNotRememberPassword = false)
     {
         return new InternalContext(
-            new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, null, null, DateTime.MaxValue, 
+            new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, rolePageModel?.PageId, rolePageModel?.Role, DateTime.MaxValue, 
                 isNotRememberPassword: isNotRememberPassword)
         );
     }
