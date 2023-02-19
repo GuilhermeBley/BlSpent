@@ -1,18 +1,20 @@
 using AutoMapper;
 using BlSpent.Application.Tests.InMemoryDb;
+using BlSpent.Application.Tests.UoW;
 
 namespace BlSpent.Application.Tests.Repositories;
 
 internal abstract class RepositoryBase
 {
-    protected readonly AppDbContext _context;
+    protected readonly IMemorySession _memorySession;
+    protected AppDbContext _context => _memorySession.Context;
     protected readonly IMapper _mapper;
 
     public RepositoryBase(
-        AppDbContext contex,
+        IMemorySession memorySession,
         IMapper mapper)
     {
-        _context = contex;
+        _memorySession = memorySession;
         _mapper = mapper;
     }
 }

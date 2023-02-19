@@ -10,7 +10,9 @@ public abstract class BaseTest : Hosts.DefaultHost
     public override void ConfigureServices(HostBuilderContext context, IServiceCollection serviceCollection)
         => serviceCollection
             .AddDbContext<InMemoryDb.AppDbContext>()
-            .AddScoped<Application.UoW.IUnitOfWork, UoW.UnitOfWork>()
+            .AddScoped<UoW.MemorySession>()
+            .AddScoped<UoW.IMemorySession>(serviceProvider => serviceProvider.GetRequiredService<UoW.MemorySession>())
+            .AddScoped<Application.UoW.IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<UoW.MemorySession>())
             .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>())
             
             .AddSingleton<Context.TestContext>()

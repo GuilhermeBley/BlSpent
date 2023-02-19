@@ -1,7 +1,6 @@
 using AutoMapper;
 using BlSpent.Application.Model;
 using BlSpent.Application.Repository;
-using BlSpent.Application.Tests.InMemoryDb;
 using BlSpent.Application.Tests.Models;
 using BlSpent.Core.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +9,8 @@ namespace BlSpent.Application.Tests.Repositories;
 
 internal class GoalRepository : RepositoryBase, IGoalRepository
 {
-    public GoalRepository(AppDbContext contex, IMapper mapper) 
-        : base(contex, mapper)
+    public GoalRepository(UoW.IMemorySession memorySession, IMapper mapper) 
+        : base(memorySession, mapper)
     {
     }
 
