@@ -31,11 +31,28 @@ public abstract class BaseTest : Hosts.DefaultHost
             .AddScoped<Application.Services.Interfaces.IGoalService, Application.Services.Implementation.GoalService>()
             .AddScoped<Application.Services.Interfaces.IEarningService, Application.Services.Implementation.EarningService>();
 
-    protected void SetContext(Model.UserModel? user = null, bool isNotRememberPassword = false)
+    protected InternalContext CreateContext(Model.UserModel? user = null, bool isNotRememberPassword = false)
     {
-        var context =
-            ServiceProvider.GetRequiredService<Context.TestContext>();
-        context.ClaimContext = new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, null, null, DateTime.MaxValue, 
-            isNotRememberPassword: isNotRememberPassword);
+        return new InternalContext(
+            new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, null, null, DateTime.MaxValue, 
+                isNotRememberPassword: isNotRememberPassword)
+        );
+    }
+
+    protected class InternalContext : IDisposable
+    {
+        private static Context.TestContext _context = new();
+        public Model.ClaimModel ClaimModel { get; }
+
+        public InternalContext(Model.ClaimModel claim)
+        {
+            ClaimModel = claim;
+            _context.ClaimContext = claim;
+        }
+
+        public void Dispose()
+        {
+            _context.ClaimContext = null;
+        }
     }
 }

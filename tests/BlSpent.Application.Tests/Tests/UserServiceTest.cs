@@ -102,7 +102,7 @@ public class UserServiceTest : BaseTest
         var userToCreate = ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
-        SetContext(userCreated);
+        using var context = CreateContext(userCreated);
 
         Assert.NotNull(
             await userService.GetByIdOrDefault(userCreated.Id)
@@ -122,7 +122,7 @@ public class UserServiceTest : BaseTest
         var oldName = userToUpdate.Name;
         userToUpdate.Name = "Updated"+userToUpdate.Name;
 
-        SetContext(userCreated);
+        using var context = CreateContext(userCreated);
 
         await userService.Update(userCreated.Id, userToUpdate);
 
@@ -144,7 +144,7 @@ public class UserServiceTest : BaseTest
         var oldName = userToUpdate.Name;
         userToUpdate.Name = "Updated"+userToUpdate.Name;
 
-        SetContext(userCreated);
+        using var context = CreateContext(userCreated);
 
         await userService.Update(userCreated.Id, userToUpdate);
 
@@ -162,7 +162,7 @@ public class UserServiceTest : BaseTest
         var userToCreate = ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
-        SetContext(userCreated);
+        using var context = CreateContext(userCreated);
 
         var newDifferentPassword = NewValidPassword() + "123";
         await userService.UpdatePassword(userCreated.Id, userToCreate.Password, newDifferentPassword);
@@ -181,7 +181,7 @@ public class UserServiceTest : BaseTest
         var userToCreate = ValidUser();
         var userCreated = await userService.Create(userToCreate);
 
-        SetContext(userCreated, isNotRememberPassword: true);
+        using var context = CreateContext(userCreated, isNotRememberPassword: true);
 
         var newDifferentPassword = NewValidPassword() + "123";
         await userService.UpdatePasswordForgot(userCreated.Id, newDifferentPassword);
