@@ -23,7 +23,7 @@ public class PageService : BaseService, IPageService
         _uoW = uoW;
     }
 
-    public async Task<PageModel> Create(PageModel pageModel)
+    public async Task<(PageModel Page, RolePageModel RolePage)> Create(PageModel pageModel)
     {
         await _securityChecker.ThrowIfIsntLogged();
 
@@ -38,7 +38,7 @@ public class PageService : BaseService, IPageService
 
         await _uoW.SaveChangesAsync();
 
-        return pageAdded;
+        return (pageAdded, rolePageAdded);
     }
 
     public async Task<PageModel?> CurrentPageGetByIdOrDefault(Guid id)
@@ -107,7 +107,7 @@ public class PageService : BaseService, IPageService
         return pageRemoved;
     }
 
-    public async IAsyncEnumerable<PageModel> GetByUser(Guid userId)
+    public async IAsyncEnumerable<PageAndRolePageModel> GetByUser(Guid userId)
     {
         await _securityChecker.ThrowIfIsntLogged();
 
@@ -118,8 +118,8 @@ public class PageService : BaseService, IPageService
         if (currentUserId != userId)
             throw new Core.Exceptions.UnauthorizedCoreException();
 
-        await foreach (var page in _pageRepository.GetPagesWhichUserCanAccess(userId))
-            yield return page;
+        await foreach (var pageAndRole in _pageRepository.GetPagesWhichUserCanAccess(userId))
+            yield return pageAndRole;
     }
 
     private async Task<Guid> GetCurrentUser()

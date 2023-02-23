@@ -5,5 +5,5 @@ namespace BlSpent.Application.Repository;
 
 public interface IPageRepository : IBaseRepository<PageModel, Page, Guid>
 {
-    IAsyncEnumerable<PageModel> GetPagesWhichUserCanAccess(Guid userId);
+    IAsyncEnumerable<PageAndRolePageModel> GetPagesWhichUserCanAccess(Guid userId);
 }

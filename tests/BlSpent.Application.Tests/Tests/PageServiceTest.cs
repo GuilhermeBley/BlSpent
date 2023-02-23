@@ -31,13 +31,13 @@ public class PageServiceTest : BaseTest
         var user =
             await CreateUser();
 
-        var context = CreateContext(user);
+        CreateContext(user);
 
-        var page = await PageService.Create(Mocks.PageMock.ValidPage());
+        var pageAndRole = await PageService.Create(Mocks.PageMock.ValidPage());
 
-        var context = CreateContext(user, page);
+        CreateContext(user, pageAndRole.RolePage);
 
-        return (user, page);
+        return (user, pageAndRole.Page);
     }
 
     private async Task<UserModel> CreateUser()
