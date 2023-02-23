@@ -26,6 +26,20 @@ public class PageServiceTest : BaseTest
         throw new NotImplementedException();
     }
 
+    private async Task<(UserModel User, PageModel Page)> CreatePageAndUser()
+    {
+        var user =
+            await CreateUser();
+
+        var context = CreateContext(user);
+
+        var page = await PageService.Create(Mocks.PageMock.ValidPage());
+
+        var context = CreateContext(user, page);
+
+        return (user, page);
+    }
+
     private async Task<UserModel> CreateUser()
     {
         var userService =
