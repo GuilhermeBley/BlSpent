@@ -40,17 +40,25 @@ internal class PageRepository : RepositoryBase, IPageRepository
         return _mapper.Map<PageModel>(pageDb);
     }
 
-    public async IAsyncEnumerable<PageModel> GetPagesWhichUserCanAccess(Guid userId)
+    public async IAsyncEnumerable<PageAndRolePageModel> GetPagesWhichUserCanAccess(Guid userId)
     {
-        var pagesDbAccess
+        var pagesAndRoles
             = (from rolePage in _context.RolesPages.AsAsyncEnumerable()
                join page in _context.Pages.AsAsyncEnumerable()
                on rolePage.PageId equals page.Id
                where rolePage.UserId == userId
-               select page);
+               select new PageAndRolePageModel{
+                    ConcurrencyStamp = page.ConcurrencyStamp,
+                    RoleId = rolePage.Id,
+                    UserId = rolePage.UserId,
+                    PageCreateDate = page.CreateDate,
+                    PageId = page.Id,
+                    PageName = page.PageName,
+                    Role = rolePage.Role
+               });
 
-        await foreach (var pageDb in pagesDbAccess)
-            yield return _mapper.Map<PageModel>(pageDb);
+        await foreach (var pageAndRole in pagesAndRoles)
+            yield return pageAndRole;
     }
 
     public async Task<PageModel?> RemoveByIdOrDefault(Guid id)

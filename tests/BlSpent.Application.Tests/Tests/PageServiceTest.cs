@@ -21,12 +21,21 @@ public class PageServiceTest : BaseTest
     }
     
     [Fact]
-    public Task CurrentPageRemove_TryRemove_Success()
+    public async Task CurrentPageRemove_TryRemove_Success()
     {
-        throw new NotImplementedException();
+        var tuple = await CreatePageAndUser();
+
+        using var context = CreateContext(tuple.User, tuple.Role);
+
+        var pageRemoved = await PageService.CurrentPageRemove(tuple.Page.Id);
+
+        Assert.Null(
+            await PageService.GetByUser(tuple.User.Id)
+                .FirstOrDefaultAsync(page => page.PageId == pageRemoved.Id)
+        );
     }
 
-    private async Task<(UserModel User, PageModel Page)> CreatePageAndUser()
+    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser()
     {
         var user =
             await CreateUser();
@@ -35,9 +44,7 @@ public class PageServiceTest : BaseTest
 
         var pageAndRole = await PageService.Create(Mocks.PageMock.ValidPage());
 
-        CreateContext(user, pageAndRole.RolePage);
-
-        return (user, pageAndRole.Page);
+        return (user, pageAndRole.Page, pageAndRole.RolePage);
     }
 
     private async Task<UserModel> CreateUser()

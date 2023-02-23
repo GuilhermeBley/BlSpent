@@ -8,7 +8,7 @@ public class PageAndRolePageModel
     /// <summary>
     /// Id
     /// </summary>
-    public Guid Id { get; set; }
+    public Guid RoleId { get; set; }
 
     /// <summary>
     /// User id

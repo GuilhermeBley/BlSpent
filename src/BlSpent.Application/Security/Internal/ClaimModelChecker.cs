@@ -134,9 +134,9 @@ internal class ClaimModelChecker
             return false;
 
         if (claimModel.AccessType is null ||
-            !claimModel.AccessType.Equals(PageClaim.ReadOnly.Value) ||
-            !claimModel.AccessType.Equals(PageClaim.Modifier.Value) ||
-            !claimModel.AccessType.Equals(PageClaim.Owner.Value))
+            (!claimModel.AccessType.Equals(PageClaim.ReadOnly.Value) &&
+            !claimModel.AccessType.Equals(PageClaim.Modifier.Value) &&
+            !claimModel.AccessType.Equals(PageClaim.Owner.Value)))
             return false;
 
         return true;
@@ -154,8 +154,8 @@ internal class ClaimModelChecker
             return false;
 
         if (claimModel.AccessType is null ||
-            !claimModel.AccessType.Equals(PageClaim.Modifier.Value) ||
-            !claimModel.AccessType.Equals(PageClaim.Owner.Value))
+            (!claimModel.AccessType.Equals(PageClaim.Modifier.Value) &&
+            !claimModel.AccessType.Equals(PageClaim.Owner.Value)))
             return false;
 
         return true;
