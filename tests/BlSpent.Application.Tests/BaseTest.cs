@@ -5,33 +5,39 @@ using Microsoft.Extensions.Hosting;
 
 namespace BlSpent.Application.Tests;
 
-public abstract class BaseTest : Hosts.DefaultHost
+public abstract class BaseTest
 {
-    public override void ConfigureServices(HostBuilderContext context, IServiceCollection serviceCollection)
-        => serviceCollection
-            .AddDbContext<InMemoryDb.AppDbContext>()
-            .AddScoped<UoW.MemorySession>()
-            .AddScoped<UoW.IMemorySession>(serviceProvider => serviceProvider.GetRequiredService<UoW.MemorySession>())
-            .AddScoped<Application.UoW.IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<UoW.MemorySession>())
-            .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>())
-            
-            .AddSingleton<Context.TestContext>()
-            .AddSingleton<Application.Security.ISecurityContext, Context.TestContext>()
-            
-            .AddScoped<Application.Repository.IUserRepository, Repositories.UserRepository>()
-            .AddScoped<Application.Repository.IPageRepository, Repositories.PageRepository>()
-            .AddScoped<Application.Repository.IRolePageRepository, Repositories.RolePageRepository>()
-            .AddScoped<Application.Repository.ICostRepository, Repositories.CostRepository>()
-            .AddScoped<Application.Repository.IGoalRepository, Repositories.GoalRepository>()
-            .AddScoped<Application.Repository.IEarningRepository, Repositories.EarningRepository>()
+    private static IServiceProvider _serviceProvider = new InternalHost().ServiceProvider;
+    public IServiceProvider ServiceProvider => _serviceProvider.CreateScope().ServiceProvider;
 
-            
-            .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
-            .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>()
-            .AddScoped<Application.Services.Interfaces.IRolePageService, Application.Services.Implementation.RolePageService>()
-            .AddScoped<Application.Services.Interfaces.ICostService, Application.Services.Implementation.CostService>()
-            .AddScoped<Application.Services.Interfaces.IGoalService, Application.Services.Implementation.GoalService>()
-            .AddScoped<Application.Services.Interfaces.IEarningService, Application.Services.Implementation.EarningService>();
+    private class InternalHost : Hosts.DefaultHost
+    {
+        public override void ConfigureServices(HostBuilderContext context, IServiceCollection serviceCollection)
+            => serviceCollection
+                .AddDbContext<InMemoryDb.AppDbContext>()
+                .AddScoped<UoW.MemorySession>()
+                .AddScoped<UoW.IMemorySession>(serviceProvider => serviceProvider.GetRequiredService<UoW.MemorySession>())
+                .AddScoped<Application.UoW.IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<UoW.MemorySession>())
+                .AddAutoMapper(builder => builder.AddProfile<Profiles.ModelsRepository>())
+                
+                .AddSingleton<Context.TestContext>()
+                .AddSingleton<Application.Security.ISecurityContext, Context.TestContext>()
+                
+                .AddScoped<Application.Repository.IUserRepository, Repositories.UserRepository>()
+                .AddScoped<Application.Repository.IPageRepository, Repositories.PageRepository>()
+                .AddScoped<Application.Repository.IRolePageRepository, Repositories.RolePageRepository>()
+                .AddScoped<Application.Repository.ICostRepository, Repositories.CostRepository>()
+                .AddScoped<Application.Repository.IGoalRepository, Repositories.GoalRepository>()
+                .AddScoped<Application.Repository.IEarningRepository, Repositories.EarningRepository>()
+
+                
+                .AddScoped<Application.Services.Interfaces.IUserService, Application.Services.Implementation.UserService>()
+                .AddScoped<Application.Services.Interfaces.IPageService, Application.Services.Implementation.PageService>()
+                .AddScoped<Application.Services.Interfaces.IRolePageService, Application.Services.Implementation.RolePageService>()
+                .AddScoped<Application.Services.Interfaces.ICostService, Application.Services.Implementation.CostService>()
+                .AddScoped<Application.Services.Interfaces.IGoalService, Application.Services.Implementation.GoalService>()
+                .AddScoped<Application.Services.Interfaces.IEarningService, Application.Services.Implementation.EarningService>();
+    }
 
     protected InternalContext CreateContext(
         Model.UserModel? user = null, 
