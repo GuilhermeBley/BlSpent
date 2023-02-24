@@ -15,8 +15,10 @@ public class PageServiceTest : BaseTest
 
         using var context = CreateContext(newUser);
 
+        var tuplePage = await PageService.Create(Mocks.PageMock.ValidPage());
+
         Assert.NotNull(
-            await PageService.Create(Mocks.PageMock.ValidPage())
+            tuplePage.Page
         );
     }
     
@@ -34,11 +36,59 @@ public class PageServiceTest : BaseTest
                 .FirstOrDefaultAsync(page => page.PageId == pageRemoved.Id)
         );
     }
-
-    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser()
+    
+    [Fact]
+    public async Task CurrentPageGetByIdOrDefault_TryGetCurrent_Success()
     {
-        var user =
-            await CreateUser();
+        var tuple = await CreatePageAndUser();
+
+        using var context = CreateContext(tuple.User, tuple.Role);
+
+        var pageGotten = await PageService.CurrentPageGetByIdOrDefault(tuple.Page.Id);
+
+        Assert.NotNull(
+            pageGotten
+        );
+    }
+
+    [Fact]
+    public async Task CurrentPageUpdate_TryUpdate_Success()
+    {
+        var tuple = await CreatePageAndUser();
+
+        using var context = CreateContext(tuple.User, tuple.Role);
+
+        var oldName = tuple.Page.PageName;
+        tuple.Page.PageName = "updated"+oldName;
+        
+        var pageUpdated = 
+            await PageService.CurrentPageUpdate(tuple.Page.Id, tuple.Page);
+
+        Assert.NotEqual(oldName, pageUpdated.PageName);
+    }
+
+    [Fact]
+    public async Task GetByUser_AddTwoPagesAndCheck_Success()
+    {
+        var tuplePage1 = await CreatePageAndUser();
+        var tuplePage2 = await CreatePageAndUser(tuplePage1.User);
+
+        var expectedPages = new Guid[] { tuplePage1.Page.Id, tuplePage2.Page.Id };
+
+        using var context = CreateContext(tuplePage1.User, tuplePage1.Role);
+
+        var pagesIdToCompare = await PageService.GetByUser(tuplePage1.User.Id)
+            .Select(page => page.PageId)
+            .ToListAsync();
+
+        Assert.Contains(tuplePage1.Page.Id, pagesIdToCompare);
+        Assert.Contains(tuplePage2.Page.Id, pagesIdToCompare);
+    }
+
+    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser(UserModel? user = null)
+    {
+        if (user is null)
+            user = await CreateUser();
 
         CreateContext(user);
 
@@ -53,10 +103,5 @@ public class PageServiceTest : BaseTest
             ServiceProvider.GetRequiredService<IUserService>();
 
         return await userService.Create(Mocks.UserMock.ValidUser());
-    }
-
-    private Task<RolePageModel> GetByPage(Guid pageId)
-    {
-        throw new NotImplementedException();
     }
 }
