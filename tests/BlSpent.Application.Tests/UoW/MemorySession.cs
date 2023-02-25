@@ -9,7 +9,7 @@ internal class MemorySession : IUnitOfWork, IMemorySession
     private bool _hasConnection { get; set; }
     private bool _hasTransaction { get; set; }
     public Guid IdSession { get; } = Guid.NewGuid();
-    public AppDbContext Context => _hasConnection ? _context : throw new InvalidOperationException("Connection not oppened.");
+    public AppDbContext Context => _hasConnection ? _context : throw new InvalidOperationException("Connection not opened.");
 
     public MemorySession(AppDbContext context)
     {
@@ -54,6 +54,6 @@ internal class MemorySession : IUnitOfWork, IMemorySession
     private void ThrowIfDontContainTransaction()
     {
         if (!_hasConnection|| !_hasTransaction)
-            throw new InvalidOperationException("Transaction not oppened.");
+            throw new InvalidOperationException("Transaction not opened.");
     }
 }
