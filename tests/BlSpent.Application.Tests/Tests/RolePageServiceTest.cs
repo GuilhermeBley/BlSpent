@@ -39,23 +39,27 @@ public class RolePageServiceTest : BaseTest
     [Fact]
     public async Task CurrentOwnerUpdateRoleModifier_RemovePage_Success()
     {
-        var tupleContext = await CreatePageAndUser();
+        var tupleOwner = await CreatePageAndUser();
 
         var userToAddInPage = await CreateUser();
 
-        using var context = CreateContext(tupleContext.User, tupleContext.Role);
+        using var contextUserToAdd = CreateContext(userToAddInPage, 
+            new RolePageModel{ PageId = tupleOwner.Page.Id }, isInvite: true);
 
         await _rolePageService.InviteRoleModifier(new InviteRolePageModel{
             Email = userToAddInPage.Email,
             CreateDate = DateTime.Now,
-            InvitationOwner = tupleContext.User.Id,
+            InvitationOwner = tupleOwner.User.Id,
             Role = Core.Security.PageClaim.Modifier.Value,
-            PageId = tupleContext.Page.Id
+            PageId = tupleOwner.Page.Id
         });
+
+        using var contextOwner = CreateContext(tupleOwner.User, tupleOwner.Role);
 
         Assert.NotNull(
             await _rolePageService.CurrentOwnerUpdateRoleReadOnly(new RolePageModel{
-                PageId = tupleContext.Page.Id,
+                Id = tupleOwner.Role.Id,
+                PageId = tupleOwner.Page.Id,
                 Role = Core.Security.PageClaim.ReadOnly.Value,
                 UserId = userToAddInPage.Id
             })

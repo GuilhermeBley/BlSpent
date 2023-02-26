@@ -42,11 +42,12 @@ public abstract class BaseTest
     protected InternalContext CreateContext(
         Model.UserModel? user = null, 
         Model.RolePageModel? rolePageModel = null,
-        bool isNotRememberPassword = false)
+        bool isNotRememberPassword = false,
+        bool isInvite = false)
     {
         return new InternalContext(
             new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, rolePageModel?.PageId, rolePageModel?.Role, DateTime.MaxValue, 
-                isNotRememberPassword: isNotRememberPassword)
+                isNotRememberPassword: isNotRememberPassword, isInvite: isInvite)
         );
     }
 
