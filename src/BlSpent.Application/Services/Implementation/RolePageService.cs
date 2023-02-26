@@ -141,7 +141,9 @@ public class RolePageService : BaseService, IRolePageService
         var tupleInfoCurrentUser = await GetCurrentInfo();
 
         if (pageId != tupleInfoCurrentUser.pageId)
-            throw new Core.Exceptions.ForbiddenCoreException("Invalid page.");
+            yield break;
+
+        using var connection = await _uoW.OpenConnectionAsync();
 
         await foreach(var roleUserPageModel in _rolePageRepository.GetByPage(pageId))
             yield return roleUserPageModel;
