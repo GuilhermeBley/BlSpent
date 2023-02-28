@@ -22,16 +22,14 @@ public class RolePageServiceTest : BaseTest
     }
 
     [Fact]
-    public async Task CurrentOwnerRemove_RemovePage_Success()
+    public async Task CurrentOwnerRemove_CurrentOwnerRemoveOwnPage_FailedCantRemoveOwnPage()
     {
         var tupleContext = await CreatePageAndUser();
 
         using var context = CreateContext(tupleContext.User, tupleContext.Role);
 
-        var pageRemoved = await _rolePageService.CurrentOwnerRemove(tupleContext.Page.Id);
-
-        Assert.Null(
-            await _rolePageService.GetByIdOrDefault(tupleContext.Page.Id)
+        await Assert.ThrowsAnyAsync<BlSpent.Core.Exceptions.ForbiddenCoreException>(
+            () => _rolePageService.CurrentOwnerRemove(tupleContext.Role.Id)
         );
     }
 
