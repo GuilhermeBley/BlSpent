@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using BlSpent.Application.Services.Interfaces;
 using BlSpent.Application.Model;
+using BlSpent.Application.Services.Implementation;
 
 namespace BlSpent.Application.Tests.Tests;
 
@@ -80,14 +81,18 @@ public class RolePageServiceTest : BaseTest
     }
 
     [Fact]
-    public async Task RemoveByIdOrDefault_OwnerTryRemove_FailedToRemoveOwnerPage()
+    public async Task RemoveByIdOrDefault_OwnerTryRemoveOwnRole_FailedToRemoveOwnerPage()
     {
-        var tupleInvite = await CreatePageUserAndInvite(role: Core.Security.PageClaim.ReadOnly.Value);
+        var provider = ServiceProvider;
+
+        var tupleInvite = await CreatePageUserAndInvite(role: Core.Security.PageClaim.ReadOnly.Value, provider: provider);
 
         using var contextOwner = CreateContext(tupleInvite.Owner, tupleInvite.RoleOwner);
-        
+
+        var rolePageService = provider.GetRequiredService<IRolePageService>();
+
         await Assert.ThrowsAnyAsync<Core.Exceptions.ForbiddenCoreException>(
-            () => _rolePageService.RemoveByIdOrDefault(tupleInvite.RoleOwner.Id)
+            () => rolePageService.RemoveByIdOrDefault(tupleInvite.RoleOwner.Id)
         );
     }
 
@@ -104,11 +109,16 @@ public class RolePageServiceTest : BaseTest
     }
 
     private async Task<(UserModel Owner, PageModel Page, RolePageModel RoleOwner, UserModel UserInvite, RolePageModel RoleUser)> CreatePageUserAndInvite(
-        string? role = null)
+        string? role = null,
+        IServiceProvider? provider = null)
     {
-        var tupleOwner = await CreatePageAndUser();
+        provider = provider ?? ServiceProvider;
 
-        var userToAddInPage = await CreateUser();
+        var rolePageService = provider.GetRequiredService<IRolePageService>();
+
+        var tupleOwner = await CreatePageAndUser(provider: provider);
+
+        var userToAddInPage = await CreateUser(provider: provider);
 
         using var contextUserToAdd = CreateContext(userToAddInPage, 
             new RolePageModel{ PageId = tupleOwner.Page.Id }, isInvite: true);
@@ -119,7 +129,7 @@ public class RolePageServiceTest : BaseTest
         RolePageModel roleUserAdded;
 
         if (role == Core.Security.PageClaim.Modifier.Value)
-            roleUserAdded = await _rolePageService.InviteRoleModifier(new InviteRolePageModel{
+            roleUserAdded = await rolePageService.InviteRoleModifier(new InviteRolePageModel{
                 Email = userToAddInPage.Email,
                 CreateDate = DateTime.Now,
                 InvitationOwner = tupleOwner.User.Id,
@@ -127,7 +137,7 @@ public class RolePageServiceTest : BaseTest
                 PageId = tupleOwner.Page.Id
             });
         else
-            roleUserAdded = await _rolePageService.InviteRoleReadOnly(new InviteRolePageModel{
+            roleUserAdded = await rolePageService.InviteRoleReadOnly(new InviteRolePageModel{
                 Email = userToAddInPage.Email,
                 CreateDate = DateTime.Now,
                 InvitationOwner = tupleOwner.User.Id,
@@ -138,23 +148,29 @@ public class RolePageServiceTest : BaseTest
         return (tupleOwner.User, tupleOwner.Page, tupleOwner.Role, userToAddInPage, roleUserAdded);
     }
 
-    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser(UserModel? user = null)
+    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser(
+        UserModel? user = null, 
+        IServiceProvider? provider = null)
     {
+        provider = provider ?? ServiceProvider;
+
         if (user is null)
             user = await CreateUser();
 
         CreateContext(user);
 
-        var pageAndRole = await ServiceProvider.GetRequiredService<IPageService>()
+        var pageAndRole = await provider.GetRequiredService<IPageService>()
             .Create(Mocks.PageMock.ValidPage());
 
         return (user, pageAndRole.Page, pageAndRole.RolePage);
     }
 
-    private async Task<UserModel> CreateUser()
+    private async Task<UserModel> CreateUser(IServiceProvider? provider = null)
     {
+        provider = provider ?? ServiceProvider;
+
         var userService =
-            ServiceProvider.GetRequiredService<IUserService>();
+            provider.GetRequiredService<IUserService>();
 
         return await userService.Create(Mocks.UserMock.ValidUser());
     }

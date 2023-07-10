@@ -267,6 +267,12 @@ public class RolePageService : BaseService, IRolePageService
             currentRoleModel.Id != rolePageId)
             throw new Core.Exceptions.ForbiddenCoreException("Invalid rolePageId.");
 
+        var roleFound = await _rolePageRepository.GetByIdOrDefault(rolePageId)
+            ?? throw new Core.Exceptions.NotFoundCoreException("Role not found to remove.");
+
+        if (roleFound.Role == Core.Security.PageClaim.Owner.Value)
+            throw new Core.Exceptions.ForbiddenCoreException("User cannot remove owner.");
+
         var rolePageRemoved =
             await _rolePageRepository.RemoveByIdOrDefault(rolePageId)
             ?? throw new Core.Exceptions.NotFoundCoreException("Role not found to remove.");
