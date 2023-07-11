@@ -37,12 +37,16 @@ public class RolePageServiceTest : BaseTest
     [Fact]
     public async Task CurrentOwnerRemove_RemoveOtherUser_Success()
     {
-        var tupleContext = await CreatePageUserAndInvite();
+        var provider = ServiceProvider;
+
+        var tupleContext = await CreatePageUserAndInvite(provider: provider);
 
         using var context = CreateContext(tupleContext.Owner, tupleContext.RoleOwner);
 
+        var rolePageService = provider.GetRequiredService<IRolePageService>();
+
         Assert.NotNull(
-            await _rolePageService.CurrentOwnerRemove(tupleContext.RoleUser.Id)
+            await rolePageService.CurrentOwnerRemove(tupleContext.RoleUser.Id)
         );
     }
 
@@ -81,7 +85,7 @@ public class RolePageServiceTest : BaseTest
     }
 
     [Fact]
-    public async Task RemoveByIdOrDefault_OwnerTryRemoveOwnRole_FailedToRemoveOwnerPage()
+    public async Task RemoveByIdOrDefault_OwnerTryRemove_FailedToRemoveOwnerPage()
     {
         var provider = ServiceProvider;
 

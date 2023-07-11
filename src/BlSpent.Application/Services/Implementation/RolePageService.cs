@@ -34,10 +34,10 @@ public class RolePageService : BaseService, IRolePageService
 
         var tupleInfoCurrentUser = await GetCurrentInfo();
 
-        var rolePage = await _rolePageRepository.GetByPageAndUserOrDefault(tupleInfoCurrentUser.userId, tupleInfoCurrentUser.pageId);
+        var rolePage = await _rolePageRepository.GetByIdOrDefault(rolePageId);
 
         if (rolePage is null ||
-            rolePage.Id != rolePageId)
+            rolePage.PageId != tupleInfoCurrentUser.pageId)
             throw new Core.Exceptions.NotFoundCoreException("role not found.");
 
         if (rolePage.UserId == tupleInfoCurrentUser.userId)
