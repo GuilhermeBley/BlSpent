@@ -84,24 +84,4 @@ public class PageServiceTest : BaseTest
         Assert.Contains(tuplePage1.Page.Id, pagesIdToCompare);
         Assert.Contains(tuplePage2.Page.Id, pagesIdToCompare);
     }
-
-    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser(UserModel? user = null)
-    {
-        if (user is null)
-            user = await CreateUser();
-
-        CreateContext(user);
-
-        var pageAndRole = await PageService.Create(Mocks.PageMock.ValidPage());
-
-        return (user, pageAndRole.Page, pageAndRole.RolePage);
-    }
-
-    private async Task<UserModel> CreateUser()
-    {
-        var userService =
-            ServiceProvider.GetRequiredService<IUserService>();
-
-        return await userService.Create(Mocks.UserMock.ValidUser());
-    }
 }

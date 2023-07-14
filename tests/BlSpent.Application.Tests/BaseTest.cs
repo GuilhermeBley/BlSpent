@@ -1,4 +1,7 @@
 using AutoMapper;
+using BlSpent.Application.Model;
+using BlSpent.Application.Services.Implementation;
+using BlSpent.Application.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +52,33 @@ public abstract class BaseTest
             new Model.ClaimModel(user?.Id, user?.Email, user?.Name, user?.LastName, rolePageModel?.PageId, rolePageModel?.Role, DateTime.MaxValue, 
                 isNotRememberPassword: isNotRememberPassword, isInvite: isInvite)
         );
+    }
+
+    protected async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser(
+        UserModel? user = null,
+        IServiceProvider? serviceProvider = null)
+    {
+        serviceProvider = serviceProvider ?? ServiceProvider;
+
+        if (user is null)
+            user = await CreateUser();
+
+        CreateContext(user);
+
+        var pageAndRole = await serviceProvider.GetRequiredService<IPageService>().Create(Mocks.PageMock.ValidPage());
+
+        return (user, pageAndRole.Page, pageAndRole.RolePage);
+    }
+
+    protected async Task<UserModel> CreateUser(
+        IServiceProvider? serviceProvider = null)
+    {
+        serviceProvider = serviceProvider ?? ServiceProvider;
+
+        var userService =
+            serviceProvider.GetRequiredService<IUserService>();
+
+        return await userService.Create(Mocks.UserMock.ValidUser());
     }
 
     protected class InternalContext : IDisposable

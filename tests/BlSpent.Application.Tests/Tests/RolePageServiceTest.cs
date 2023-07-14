@@ -120,9 +120,9 @@ public class RolePageServiceTest : BaseTest
 
         var rolePageService = provider.GetRequiredService<IRolePageService>();
 
-        var tupleOwner = await CreatePageAndUser(provider: provider);
+        var tupleOwner = await CreatePageAndUser(serviceProvider: provider);
 
-        var userToAddInPage = await CreateUser(provider: provider);
+        var userToAddInPage = await CreateUser(serviceProvider: provider);
 
         using var contextUserToAdd = CreateContext(userToAddInPage, 
             new RolePageModel{ PageId = tupleOwner.Page.Id }, isInvite: true);
@@ -150,32 +150,5 @@ public class RolePageServiceTest : BaseTest
             });
 
         return (tupleOwner.User, tupleOwner.Page, tupleOwner.Role, userToAddInPage, roleUserAdded);
-    }
-
-    private async Task<(UserModel User, PageModel Page, RolePageModel Role)> CreatePageAndUser(
-        UserModel? user = null, 
-        IServiceProvider? provider = null)
-    {
-        provider = provider ?? ServiceProvider;
-
-        if (user is null)
-            user = await CreateUser();
-
-        CreateContext(user);
-
-        var pageAndRole = await provider.GetRequiredService<IPageService>()
-            .Create(Mocks.PageMock.ValidPage());
-
-        return (user, pageAndRole.Page, pageAndRole.RolePage);
-    }
-
-    private async Task<UserModel> CreateUser(IServiceProvider? provider = null)
-    {
-        provider = provider ?? ServiceProvider;
-
-        var userService =
-            provider.GetRequiredService<IUserService>();
-
-        return await userService.Create(Mocks.UserMock.ValidUser());
     }
 }
